@@ -1,12 +1,7 @@
 define(['core/maths'], function(maths) {
-  function Particle(position, velocity, mass, q) {
-    this.position = position || maths.Vector3();
-    this.velocity = velocity || maths.Vector3();
-    this.mass = mass || 1;
-    this.q = q || 0;
+  function Particle(name) {
+    this.name = name;
   }
 
-  return {
-    Particle: Particle,
-  }
+  return Particle;
 })

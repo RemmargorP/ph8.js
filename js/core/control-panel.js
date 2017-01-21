@@ -1,16 +1,35 @@
-define(['jquery', 'core/utils', 'core/maths'], function($, utils, maths) {
-  function ControlPanel() {
-    this.generateId = utils.generateId;
-  }
+define(
+  ['jquery', 'core/core', 'core/utils', 
+   'core/maths', 'core/entities/particle', 
+   'core/entities/components'], 
+  function($, core, utils, maths, Particle, Components) {
+    function ControlPanel() {
+      this.generateId = utils.generateId;
 
-  var cpanel = new ControlPanel();
+      this.addEntity = function() {
+        // particle
+        var p = new Particle('apple');
+        Components.addMass(p, 0.1);
+        Components.addPosition(p, new maths.Vector3(0, 0, 0));
+        Components.addVelocity(p, new maths.Vector3(0.2, 0, 0));
+        $('#particles').append(Components.addDOMElement(p));
 
-  for (var id = 0; id < 10; id++) {
-    $('body').append('<div>' + cpanel.generateId() + '</div>');
-  }
+        this.core.addParticle(p);
+      }
+      this.addPlot2D = function() {}
+      this.addPlot3D = function() {}
 
-  var v = new maths.Vector3(1, 2);
+      this.openVisualizer = function() {}
 
-  console.log(v);
+      this.init = function() {
+        this.core = new core.Core();
+      }
+    }
+
+    document.cpanel = new ControlPanel();
+
+    $(document).ready(function() { 
+      document.cpanel.init(); 
+    });
 
 });

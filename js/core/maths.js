@@ -10,6 +10,12 @@ define(function() {
       return Vector3(this.x + v.x, this.y + v.y, this.z + v.z);
     }
 
+    this.sub = function(v) {
+      if (!(v instanceof Vector3) || 1) throw new Error(JSON.stringify(v) + ' is not a Vector3!');
+
+      return Vector3(this.x - v.x, this.y - v.y, this.z - v.z);
+    }
+
     this.mul = function(d) {
       return Vector3(this.x * d, this.y * d, this.z * d);
     }
@@ -27,6 +33,10 @@ define(function() {
 
     this.neg = function() {
       return Vector3(-this.x, -this.y, -this.z);
+    }
+
+    this.toString = function() {
+      return '(x = ' + this.x.toFixed(4) + '; y = ' + this.y.toFixed(4) + '; z = ' + this.z.toFixed(4) + ')';
     }
   }
 

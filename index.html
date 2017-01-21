@@ -1,13 +1,32 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="UTF-8">
-  <title>Control Panel</title>
-  <script src="js/libs/jquery.js"></script>
-  <script data-main="js/core/core-loader.js" src="js/libs/require.js"></script>
-  <link rel="stylesheet" type="text/css" href="css/style.css">
-</head>
-<body>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <script src="js/libs/jquery.js"></script>
+    <script data-main="js/core/core-loader.js" src="js/libs/require.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
 
-</body>
+    <title>Control Panel</title>
+  </head>
+  <body>
+
+    <div class="container">
+      <p class="h2">Dashboard</p>
+      <button class="btn btn-default" onclick="cpanel.addEntity();">Add Particle</button>
+      <button class="btn btn-default" onclick="cpanel.addPlot2D();">Add Plot 2D</button>
+      <button class="btn btn-default" onclick="cpanel.addPlot3D();">Add Plot 3D</button>
+      <button class="btn btn-default" onclick="cpanel.openVisualizer();">Open Visualizer</button>
+    </div>
+
+    <div class="container" style="margin-top:60px;">
+      <table id="particles" class="table table-stripped">
+        <tr><th width="20%">Particle</th><th width="20%">Property</th><th width="60%">Value</th></tr>
+      </table>
+    </div>
+
+    <script src="js/libs/bootstrap.min.js"></script>
+  </body>
 </html>

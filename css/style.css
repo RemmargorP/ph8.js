@@ -1,43 +1,12 @@
 body {
   font-family: "Trebuchet MS", Helvetica, sans-serif;
-  width: 400px;
 }
 
 span, div {
-  margin-bottom: 20px;
-}
-
-div.component {
-  border: 1px solid black;
-  padding: 5px;
-  margin: 5px;
-}
-
-div.entity::before {
-  content: "▶ ";
-}
-div.entity {
-  border: 1px solid #BA9A62;
-  padding: 5px;
-  margin: 5px;
-  display: block;
-}
-
-div.entity.expanded::before {
-  content: "▽ ";
-}
-div.entity.expanded {
-}
-
-.properties {
-  display: none;
-}
-.properties.expanded {
-  display: block;
 }
 
 button {
-  background-color: #D18D92;
+  background-color: #6EE87B;
   border: none;
   color: black;
   text-align: center;
