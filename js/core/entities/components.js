@@ -6,8 +6,8 @@ define(['three', 'jquery', 'core/entities/field', 'core/maths'], function(THREE,
     particle.mass = mass;
   }
 
-  function addCharge(particle, q) {
-    particle.q = q;
+  function addCharge(particle, charge) {
+    particle.charge = charge;
   }
 
   function addPosition(particle, pos) {
@@ -34,24 +34,40 @@ define(['three', 'jquery', 'core/entities/field', 'core/maths'], function(THREE,
 
   /** RENDER */
 
+  function addWebController(particle) {
+    particle.webcontroller = $('<span class="glyphicon glyphicon-cog"></span>');
+    particle.webcontroller.click(function() {
+      var winoptions = window.open('about:blank', '_blank', 'location=0,menubar=0,toolbar=0,height=700,width=800,status=0');
+      
+      winoptions.document.write('This is ' + particle.name);
+    });
+  }
+
   function addDOMElement(particle) {
     var nameprinted = false;
     
-    particle.dom = $('<table></table>');
-    console.log(particle.dom.outerHTML);
+    particle.dom = [];
 
     for (key in particle) {
-      if (key == 'dom' || key == 'renderObject' || key == 'name') continue;
+      if (key == 'dom' || key == 'renderObject' || key == 'name' || key == 'webcontroller') continue;
       
-      if (!nameprinted)
-        particle.dom.append('<tr><td>'+particle.name+'</td><td>' + key + '</td><td>' + particle[key] + '</td></tr>');
-      else
-        particle.dom.append('<tr><td></td><td>' + key + '</td><td>' + particle[key] + '</td></tr>');
-      nameprinted = true;
-      console.log(particle.dom.html());
-    }
 
-    particle.dom = $(particle.dom.html());
+      var domname, domfield, domvalue;
+
+      if (nameprinted) {
+        domname = $('<td></td>');
+      } else {
+        domname = $('<td></td>').append($('<span></span>').text(particle.name));
+        if ('webcontroller' in particle) domname.append(particle.webcontroller);
+      }
+
+      domfield = $('<td></td>').text(key);
+      domvalue = $('<td></td>').text(particle[key]);
+
+
+      particle.dom.push( $('<tr></tr>').append(domname).append(domfield).append(domvalue) );
+      nameprinted = true;
+    }
 
     return particle.dom;
   }
@@ -74,6 +90,7 @@ define(['three', 'jquery', 'core/entities/field', 'core/maths'], function(THREE,
     addPosition: addPosition,
     addVelocity: addVelocity,
     makeGravityField: makeGravityField,
+    addWebController: addWebController,
     addDOMElement: addDOMElement,
     addRender: addRender,
   };

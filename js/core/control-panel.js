@@ -8,12 +8,11 @@ define(
 
       this.addEntity = function() {
         // particle
-        var p = new Particle('apple');
-        Components.addMass(p, 0.1);
-        Components.addPosition(p, new maths.Vector3(0, 0, 0));
-        Components.addVelocity(p, new maths.Vector3(0.2, 0, 0));
-        $('#particles').append(Components.addDOMElement(p));
-
+        var p = new Particle(this.generateId());
+        Components.addWebController(p);
+        Components.addMass(p, 1337);
+        Components.addDOMElement(p);
+        $('#particles').append(p.dom);
         this.core.addParticle(p);
       }
       this.addPlot2D = function() {}
