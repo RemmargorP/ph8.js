@@ -50,7 +50,7 @@ define(['three', 'jquery', 'core/entities/field', 'core/maths'], function(THREE,
         domwebcontroller = particle.webcontroller || $('');
 
 
-    particle.dom.append($('<td></td>').append(domname).append(domwebcontroller));
+    particle.dom.append($('<td></td>').append(domwebcontroller).append(domname));
 
     var tmp = $('<tbody></tbody>');
 
@@ -65,7 +65,9 @@ define(['three', 'jquery', 'core/entities/field', 'core/maths'], function(THREE,
       tmp.append( $('<tr></tr>').append(domfield).append(domvalue) );
     }
 
-    particle.dom.append( $('<td></td>').append( $('<table class="table table-bordered"></table>').append(tmp) ) );
+    particle.dom.append( $('<td></td>').append( $('<table class="table table-bordered"></table>').append(tmp) ).click(function() {
+      $(this).find('.table').slideToggle("fast");
+    }) );
 
     return particle.dom;
   }

@@ -4,7 +4,7 @@ define(function() {
     this.fields = {};
 
     this.addParticle = function(particle) {
-      this.particles[particle.name] = particle;
+      this.particles[particle.id] = particle;
     }
   }
 
