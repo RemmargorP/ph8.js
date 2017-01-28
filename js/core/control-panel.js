@@ -8,11 +8,11 @@ define(
 
       this.addEntity = function() {
         // particle
-        var p = new Particle('apple');
+        var p = new Particle(this.generateId());
         Components.addMass(p, 0.1);
         Components.addPosition(p, new maths.Vector3(0, 0, 0));
         Components.addVelocity(p, new maths.Vector3(0.2, 0, 0));
-        $('#particles').append(Components.addDOMElement(p));
+        $('#particles').append($('<tr></tr>').append( $('<td></td>').text(p.name) ).append( $('<td></td>').append(Components.addDOMElement(p)) ) );
 
         this.core.addParticle(p);
       }

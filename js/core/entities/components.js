@@ -37,21 +37,19 @@ define(['three', 'jquery', 'core/entities/field', 'core/maths'], function(THREE,
   function addDOMElement(particle) {
     var nameprinted = false;
     
-    particle.dom = $('<table></table>');
+    particle.dom = $('<table class="table table-bordered"></table>');
+    var tmp = particle.dom.append($('<tbody></tbody>'));
     console.log(particle.dom.outerHTML);
 
     for (key in particle) {
       if (key == 'dom' || key == 'renderObject' || key == 'name') continue;
       
       if (!nameprinted)
-        particle.dom.append('<tr><td>'+particle.name+'</td><td>' + key + '</td><td>' + particle[key] + '</td></tr>');
+        tmp.append('<tr><td>' + key + '</td><td>' + particle[key] + '</td></tr>');
       else
-        particle.dom.append('<tr><td></td><td>' + key + '</td><td>' + particle[key] + '</td></tr>');
+        tmp.append('<tr><td>' + key + '</td><td>' + particle[key] + '</td></tr>');
       nameprinted = true;
-      console.log(particle.dom.html());
     }
-
-    particle.dom = $(particle.dom.html());
 
     return particle.dom;
   }
