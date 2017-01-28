@@ -5,15 +5,17 @@ define(
   function($, core, utils, maths, Particle, Components) {
     function ControlPanel() {
       this.generateId = utils.generateId;
+      this.core = new core.Core();
 
       this.addEntity = function() {
         // particle
         var p = new Particle(this.generateId());
-        Components.addMass(p, 0.1);
-        Components.addPosition(p, new maths.Vector3(0, 0, 0));
-        Components.addVelocity(p, new maths.Vector3(0.2, 0, 0));
-        $('#particles').append($('<tr></tr>').append( $('<td></td>').text(p.name) ).append( $('<td></td>').append(Components.addDOMElement(p)) ) );
-
+        Components.setWebController(p);
+        Components.setMass(p, Math.PI);
+        Components.setPosition(p, new maths.Vector3(1, 2, 3));
+        Components.setVelocity(p, new maths.Vector3(0.1, 2, 0.1));
+        Components.setDOMElement(p);
+        $('#particles').append(p.dom);
         this.core.addParticle(p);
       }
       this.addPlot2D = function() {}
@@ -21,9 +23,7 @@ define(
 
       this.openVisualizer = function() {}
 
-      this.init = function() {
-        this.core = new core.Core();
-      }
+      this.init = function() {}
     }
 
     document.cpanel = new ControlPanel();
