@@ -43,7 +43,6 @@ define(['three', 'jquery', 'core/entities/field', 'core/maths'], function(THREE,
       var winoptions = window.open('particle_options.html', 'options_' + particle.id, 'location=0,menubar=0,toolbar=0,height=700,width=800,status=0');
       
       winoptions.particle = particle;
-      console.log('tuta4ki');
     });
   }
 
