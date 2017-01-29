@@ -24,9 +24,12 @@ define(['three', 'jquery', 'core/entities/field', 'core/maths'], function(THREE,
     var f = Field(particle);
 
     f.impactOn = function(current, nextstate, deltaT) {
-      var deltaA = sub(current.position, particle.position) //
-                    .mul(G * particle.mass * current.mass / sub(current.position, particle.position).len()**3 * deltaT);
-      nextstate.velocity = nextstate.velocity.set(deltaA);
+      // m_cur * vec(a) = G (m_cur * m_this / R^3) * vec(R_(cur->this))
+      // deltaV = vec(a) * deltaT
+      var deltaA = sub(current.position, particle.position) 
+                    .mul(G * particle.mass / sub(current.position, particle.position).len()**3 * deltaT);
+
+      nextstate.velocity = nextstate.velocity.add(deltaA);
     }
 
     return f;
@@ -37,18 +40,26 @@ define(['three', 'jquery', 'core/entities/field', 'core/maths'], function(THREE,
   function setWebController(particle) {
     particle.webcontroller = $('<span class="glyphicon glyphicon-cog"></span>');
     particle.webcontroller.click(function() {
-      var winoptions = window.open('about:blank', '_blank', 'location=0,menubar=0,toolbar=0,height=700,width=800,status=0');
+      var winoptions = window.open('particle_options.html', 'options_' + particle.id, 'location=0,menubar=0,toolbar=0,height=700,width=800,status=0');
       
-      winoptions.document.write('This is ' + particle.name);
+      winoptions.particle = particle;
+      console.log('tuta4ki');
     });
   }
 
   function setDOMElement(particle) {
-    particle.dom = $('<tr></tr>');
+    if (particle.dom == undefined) {
+      particle.dom = $('<tr></tr>');
+      particle.dom.click(function() {
+        $(this).find('.table').slideToggle("fast");
+      });
+    } else {
+      if (particle.webcontroller != undefined) particle.webcontroller.detach();
+      particle.dom.empty(); 
+    }
 
     var domname = $('<span></span>').text(particle.name),
         domwebcontroller = particle.webcontroller || $('');
-
 
     particle.dom.append($('<td></td>').append(domwebcontroller).append(domname));
 
@@ -65,9 +76,11 @@ define(['three', 'jquery', 'core/entities/field', 'core/maths'], function(THREE,
       tmp.append( $('<tr></tr>').append(domfield).append(domvalue) );
     }
 
-    particle.dom.append( $('<td></td>').append( $('<table class="table table-bordered"></table>').append(tmp) ).click(function() {
-      $(this).find('.table').slideToggle("fast");
-    }) );
+    particle.dom.append( $('<td></td>').append( $('<table class="table table-bordered"></table>').append(tmp) ));
+
+    setTimeout(function() {
+      setDOMElement(particle);
+    }, 2500); // update every 2.5s
 
     return particle.dom;
   }
