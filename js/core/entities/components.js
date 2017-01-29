@@ -47,13 +47,17 @@ define(['three', 'jquery', 'core/entities/field', 'core/maths'], function(THREE,
   }
 
   function setDOMElement(particle) {
+    var ishidden = false;
+
     if (particle.dom == undefined) {
       particle.dom = $('<tr></tr>');
       particle.dom.click(function() {
-        $(this).find('.table').slideToggle("fast");
+        $(this).find('.table').toggleClass('hidden');
       });
     } else {
       if (particle.webcontroller != undefined) particle.webcontroller.detach();
+      console.log(particle.dom.find('table'));
+      ishidden = particle.dom.find('table').hasClass('hidden');
       particle.dom.empty(); 
     }
 
@@ -75,7 +79,7 @@ define(['three', 'jquery', 'core/entities/field', 'core/maths'], function(THREE,
       tmp.append( $('<tr></tr>').append(domfield).append(domvalue) );
     }
 
-    particle.dom.append( $('<td></td>').append( $('<table class="table table-bordered"></table>').append(tmp) ));
+    particle.dom.append( $('<td></td>').append( $('<table class="table table-bordered' + (ishidden? ' hidden' : '') + '"></table>').append(tmp) ));
 
     setTimeout(function() {
       setDOMElement(particle);

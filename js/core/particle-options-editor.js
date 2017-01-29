@@ -8,7 +8,8 @@ define(
         if (particle != undefined) {
           this.particle = particle;
 
-          this.particle['name'] += '.';
+          this.particle['name'] = 'Name Changed';
+          this.particle['new field'] = 'New Field Created & Mass Changed (+10)';
           this.particle['mass'] += 10;
 
           $('h1').remove();
@@ -20,7 +21,6 @@ define(
           }
         } else {
           setTimeout(this.init, 50);
-          console.log('...');
         }
       }
     }
