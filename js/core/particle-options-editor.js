@@ -8,6 +8,8 @@ define(
         if (particle != undefined) {
           this.particle = particle;
 
+          $('#name').text(this.particle['name']);
+
           this.particle['name'] = 'Name Changed';
           this.particle['new field'] = 'New Field Created & Mass Changed (+10)';
           this.particle['mass'] += 10;

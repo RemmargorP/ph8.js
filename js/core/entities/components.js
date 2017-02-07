@@ -1,9 +1,23 @@
 define(['three', 'jquery', 'core/entities/field', 'core/maths'], function(THREE, $, Field, maths) {
 
+  function Component() {
+    this.valueOf = function() { return 0; }
+    this.toString = function() { return "<null>"; };
+    this.DOMsetter = $('');
+  }
+
   /** PHYSICS */
 
   function setMass(particle, mass) {
-    particle.mass = mass;
+    particle.mass = new Component();
+    particle.mass.value = mass;
+    particle.mass.valueOf = function() { return particle.mass.value; };
+    particle.mass.toString = function() { return particle.mass.value + ' kg'; };
+
+    particle.mass.DOMsetter = $('<input value=""></input>').attr('value', particle.mass).text('Mass').click(function() {
+      particle.mass.value = parseFloat( $(this).text() );
+    });
+
   }
 
   function setCharge(particle, charge) {
@@ -56,7 +70,6 @@ define(['three', 'jquery', 'core/entities/field', 'core/maths'], function(THREE,
       });
     } else {
       if (particle.webcontroller != undefined) particle.webcontroller.detach();
-      console.log(particle.dom.find('table'));
       ishidden = particle.dom.find('table').hasClass('hidden');
       particle.dom.empty(); 
     }
