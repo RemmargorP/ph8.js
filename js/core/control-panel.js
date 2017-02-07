@@ -1,8 +1,7 @@
 define(
   ['jquery', 'core/core', 'core/utils', 
-   'core/maths', 'core/entities/particle', 
-   'core/entities/components'], 
-  function($, core, utils, maths, Particle, Components) {
+   'core/geometry', 'core/entities/particle'], 
+  function($, core, utils, Geometry, Particle) {
     function ControlPanel() {
       this.generateId = utils.generateId;
       this.core = new core.Core();
@@ -10,14 +9,7 @@ define(
       this.addEntity = function() {
         var p = new Particle(this.generateId());
 
-        Components.setWebController(p);
-        Components.setMass(p, Math.PI);
-        Components.setCharge(p, 1.6*1e-9);
-        Components.setPosition(p, new maths.Vector3(1, 2, 3));
-        Components.setVelocity(p, new maths.Vector3(0.1, 2, 0.1));
-        Components.setDOMElement(p);
-
-        $('#particles').append(p.dom);
+        $('#particles').append(p.DOMs.listRow);
 
         this.core.addParticle(p);
       }
