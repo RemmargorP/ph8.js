@@ -7,7 +7,13 @@ define(function() {
     return id_gen_names[id_gen_counter];
   }
 
+  function isFloat(value) {
+    if (!value.toString().match(/^-?[0-9]+([.][0-9]+)?$/)) return false;  // if not 123.4567
+    return true;
+  }
+
   return {
-    generateId: generateId
+    generateId: generateId,
+    isFloat: isFloat,
   }
 });

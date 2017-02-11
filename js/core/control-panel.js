@@ -1,17 +1,17 @@
 define(
   ['jquery', 'core/core', 'core/utils', 
    'core/geometry', 'core/entities/particle'], 
-  function($, core, utils, Geometry, Particle) {
+  function($, Core, Utils, Geometry, Particle) {
     function ControlPanel() {
-      this.generateId = utils.generateId;
-      this.core = new core.Core();
+      this.generateId = Utils.generateId;
+      this.Core = new Core.Core();
 
       this.addEntity = function() {
         var p = new Particle(this.generateId());
 
         $('#particles').append(p.DOMs.listRow);
 
-        this.core.addParticle(p);
+        this.Core.addParticle(p);
       }
       this.addPlot2D = function() {}
       this.addPlot3D = function() {}

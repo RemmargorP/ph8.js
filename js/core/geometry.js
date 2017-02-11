@@ -22,7 +22,7 @@ define(function() {
   }
 
   Vector3.prototype.len = function() {
-    return (this.x*this.x + this.y*this.y + this.z*this.z) ** 0.5;
+    return Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z);
   }
 
   Vector3.prototype.norm = function(l) {

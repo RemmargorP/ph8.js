@@ -15,14 +15,15 @@ define(['jquery', 'core/geometry', 'uuid'], function($, Geometry, UUID) {
     this.history = []; // TODO
 
 
-
-
     // Web controls
     this.DOMs = {};
     this.DOMs.webcontroller = $('<span class="glyphicon glyphicon-cog"></span>');
     this.DOMs.webcontroller.click(function() {
       var winoptions = window.open('particle_options.html', 'options_' + that.id, 'location=0,menubar=0,toolbar=0,height=700,width=800,status=0');
       winoptions.particle = that;
+      winoptions.onbeforeunload = function() {
+        that.DOMs.refreshListRow.click();
+      }
     });
 
     this.DOMs.refreshListRow = $('<span class="glyphicon glyphicon-refresh"></span>');
@@ -46,7 +47,7 @@ define(['jquery', 'core/geometry', 'uuid'], function($, Geometry, UUID) {
     var keys = ['position', 'velocity', 'mass', 'charge'];
     for (var i = 0; i < keys.length; i++) {
       var key = keys[i];
-      props.append( $('<tr></tr>').append( $('<td></td>').text(key) ).append( $('<td></td>').text(this[key]).attr('id', key) ) );
+      props.append( $('<tr></tr>').append( $('<td></td>').text(key) ).append( $('<td id="'+key+'"></td>').text(this[key]) ));
     }
 
     this.DOMs.listRow.append( $('<td></td>').append( $('<table class="table table-bordered"></table>').append(props) ));
