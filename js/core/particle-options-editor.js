@@ -5,11 +5,19 @@ define(
     function Editor() {
       var that = this;
 
+      this.update = function() {
+        console.log(that.particle);
+        console.log(that.particle.renderObject.position);
+        that.particle.renderObject.position.set(that.position.x, that.position.y, that.position.z);
+      }
+
       this.makeTextProperty = function(key) {
         var field = $('<input type="text">'), fieldSetter = $('<input type="button" value="Set">');
         field.val(that.particle[key]);
         fieldSetter.click(function(event) {
+          //console.log('wut')
           that.particle[key] = field.val();
+          that.update();
         });
         return $('<span></span>').append(field).append(fieldSetter);
       }
@@ -22,7 +30,9 @@ define(
             alert("Value must be a float number!");
             return;
           }
+          //console.log('wut2')
           that.particle[key] = parseFloat(field.val());
+          that.update();
         });
         return $('<span></span>').append(field).append(fieldSetter);
       }
@@ -36,6 +46,7 @@ define(
             return;
           }
           that.particle[key][comp] = parseFloat(field.val());
+          that.update();
         });
         return $('<div>'+comp+'</div>').append(field).append(fieldSetter);
       }
@@ -64,8 +75,6 @@ define(
           $props.append( $('<tr></tr>').append( $('<td></td>').text('Charge') ).append( $('<td></td>').append(that.makeFloatProperty('charge') ) ) )
           $props.append( $('<tr></tr>').append( $('<td></td>').text('Position') ).append( $('<td></td>').append(that.makeVector3Property('position') ) ) )
           $props.append( $('<tr></tr>').append( $('<td></td>').text('Velocity') ).append( $('<td></td>').append(that.makeVector3Property('velocity') ) ) )
-
-
 
         } else {
           setTimeout(this.init, 50);

@@ -1,6 +1,6 @@
-define(['jquery', 'core/geometry', 'uuid'], function($, Geometry, UUID) {
+define(['jquery', 'three', 'core/geometry', 'uuid', 'core/utils'], function($, THREE, Geometry, UUID, Utils) {
 
-  function Particle(name, mass, charge, pos, vel) {
+  function Particle(name, mass, charge, pos, vel, radius, color) {
     var that = this;
 
     this.id = UUID();
@@ -13,7 +13,16 @@ define(['jquery', 'core/geometry', 'uuid'], function($, Geometry, UUID) {
     this.currentForce = new Geometry.Vector3(0, 0, 0); // for current iteration of simulation
 
     this.history = []; // TODO
+    var r = radius || 5;
+    var col = color || Utils.getRandomColor();
+    var geometry = new THREE.SphereGeometry( r, 32, 32 );
+    var material = new THREE.MeshBasicMaterial( {color: col} );
+    var sphere = new THREE.Mesh( geometry, material );
+    //sphere.__dirtyPosition = true;
+    sphere.__dirtyRotation = true;
+    sphere.position.set(this.position.x, this.position.y, this.position.z);
 
+    this.renderObject = sphere;
 
     // Web controls
     this.DOMs = {};
@@ -36,6 +45,10 @@ define(['jquery', 'core/geometry', 'uuid'], function($, Geometry, UUID) {
     })
 
     this.DOMs.listRow = $('<tr></tr>');
+
+    this.DOMs.listRow.click(function() {
+      $(this).find('td table').toggleClass('hidden');
+    })
     
     var domname = $('<td></td>');
     domname.append(this.DOMs.refreshListRow);
@@ -49,6 +62,8 @@ define(['jquery', 'core/geometry', 'uuid'], function($, Geometry, UUID) {
       var key = keys[i];
       props.append( $('<tr></tr>').append( $('<td></td>').text(key) ).append( $('<td id="'+key+'"></td>').text(this[key]) ));
     }
+
+
 
     this.DOMs.listRow.append( $('<td></td>').append( $('<table class="table table-bordered"></table>').append(props) ));
 
