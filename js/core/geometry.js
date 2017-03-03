@@ -39,6 +39,9 @@ define(function() {
   Vector3.prototype.toString = function() {
     return '(x = ' + this.x.toFixed(4) + '; y = ' + this.y.toFixed(4) + '; z = ' + this.z.toFixed(4) + ')';
   }
+  Vector3.prototype.copy = function() {
+    return new Vector3(this.x, this.y, this.z);
+  }
 
   return {
     Vector3: Vector3

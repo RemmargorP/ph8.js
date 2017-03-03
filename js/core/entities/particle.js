@@ -1,6 +1,6 @@
 define(['jquery', 'three', 'core/geometry', 'uuid', 'core/utils'], function($, THREE, Geometry, UUID, Utils) {
 
-  function Particle(name, mass, charge, pos, vel, radius, color) {
+  function Particle(name, mass, charge, pos, vel, radius, color, historyOptions) {
     var that = this;
 
     this.id = UUID();
@@ -10,9 +10,56 @@ define(['jquery', 'three', 'core/geometry', 'uuid', 'core/utils'], function($, T
     this.position = pos || new Geometry.Vector3(0, 0, 0);
     this.velocity = vel || new Geometry.Vector3(0, 0, 0);
 
-    this.currentForce = new Geometry.Vector3(0, 0, 0); // for current iteration of simulation
+    this.currentForce = new Geometry.Vector3(0, 0, 0); // for current step of simulation
 
-    this.history = []; // TODO
+    this.historyOptions = historyOptions || {};
+    this.historyOptions.maxSize = this.historyOptions.maxSize || 10000;
+    this.historyOptions.precision = this.historyOptions.precision || 1e-1; // if any of properties changed more than (precision) than save current state
+
+    this.history = [];
+
+    this.makeHistoryStamp = function(timestamp) {
+      return {
+        time: timestamp,
+        name: that.name,
+        mass: that.mass,
+        charge: that.charge,
+        position: that.position,
+        velocity: that.velocity,
+      }
+    }
+    this.history[0] = this.makeHistoryStamp(-1);
+
+    this.updateHistory = function(timestamp) {
+      if (that.history.length == 0) {
+        that.history[0] = that.makeHistoryStamp(timestamp);
+        return;
+      }
+
+      var cur, last = that.history[that.history.length - 1];
+
+      timestamp = timestamp || last.time;
+
+      cur = that.makeHistoryStamp(timestamp);
+
+      console.log(cur);
+
+      var update = false;
+      update |= cur.name != last.name;
+      update |= Math.abs(cur.mass - last.mass) > that.historyOptions.precision;
+      update |= cur.position.sub(last.position).len() > that.historyOptions.precision;
+      // update |= cur.velocity.sub(last.velocity).len() > that.historyOptions.precision; // not necessary
+
+      if (update) {
+        that.history[that.history.length] = cur;
+        if (that.history.length > that.historyOptions.maxSize)
+          that.history = that.history.slice(that.history.length - that.historyOptions.maxSize);
+      }
+    }
+
+
+
+
     var r = radius || 5;
     var col = color || Utils.getRandomColor();
     var geometry = new THREE.SphereGeometry( r, 32, 32 );
@@ -20,6 +67,7 @@ define(['jquery', 'three', 'core/geometry', 'uuid', 'core/utils'], function($, T
     var sphere = new THREE.Mesh( geometry, material );
     //sphere.__dirtyPosition = true;
     sphere.__dirtyRotation = true;
+    sphere.matrixAutoUpdate = false;
     sphere.position.set(this.position.x, this.position.y, this.position.z);
 
     this.renderObject = sphere;

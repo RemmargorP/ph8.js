@@ -6,9 +6,11 @@ define(
       var that = this;
 
       this.update = function() {
-        console.log(that.particle);
-        console.log(that.particle.renderObject.position);
-        that.particle.renderObject.position.set(that.position.x, that.position.y, that.position.z);
+        //console.log(that.particle);
+        //console.log(that.particle.renderObject.position);
+        that.particle.updateHistory();
+        that.particle.renderObject.position.set(that.particle.position.x, that.particle.position.y, that.particle.position.z);
+        that.particle.renderObject.updateMatrix();
       }
 
       this.makeTextProperty = function(key) {
@@ -30,7 +32,7 @@ define(
             alert("Value must be a float number!");
             return;
           }
-          //console.log('wut2')
+          console.log('wut2')
           that.particle[key] = parseFloat(field.val());
           that.update();
         });
@@ -45,7 +47,10 @@ define(
             alert("Value must be a float number!");
             return;
           }
-          that.particle[key][comp] = parseFloat(field.val());
+          console.log(that.particle[key]);
+          var tmp = that.particle[key].copy();
+          tmp[comp] = parseFloat(field.val());
+          that.particle[key] = tmp;
           that.update();
         });
         return $('<div>'+comp+'</div>').append(field).append(fieldSetter);

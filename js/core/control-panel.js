@@ -6,10 +6,13 @@ define(
       var that = this;
 
       this.generateId = Utils.generateId;
-      this.core = new Core.Core();
       this.scene = new THREE.Scene();
 
       this.scene.add(new THREE.AxisHelper(30000));
+
+      this.core = new Core.Core();
+      
+      //
 
       this.addEntity = function() {
         var p = new Particle(this.generateId(), Math.random(), Math.random(), new Geometry.Vector3(Math.random()*100, Math.random()*100, Math.random()*100));
@@ -27,7 +30,8 @@ define(
         winVisualizer.scene = that.scene;
       }
 
-      this.init = function() {}
+      this.init = function() {
+      };
     }
 
     document.cpanel = new ControlPanel();
