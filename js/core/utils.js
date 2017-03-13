@@ -12,13 +12,30 @@ define(['three'], function(THREE) {
     return true;
   }
 
-  function getRandomColor() {
+  function getRandomColor(maxOpacity) {
+    maxOpacity = maxOpacity || 1;
     var letters = '0123456789ABCDEF';
     var color = '#';
     for (var i = 0; i < 6; i++ ) {
-        color += letters[Math.floor(Math.random() * 16)];
+        color += letters[Math.floor(Math.random() * 16 * maxOpacity)];
     }
     return color;
+  }
+
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
   }
 
   function makeTextSprite( message, parameters ) {
@@ -26,16 +43,18 @@ define(['three'], function(THREE) {
     
     var fontface = parameters.hasOwnProperty("fontface") ? 
       parameters["fontface"] : "Arial";
-    
     var fontsize = parameters.hasOwnProperty("fontsize") ? 
       parameters["fontsize"] : 18;
-    
     var backgroundColor = parameters.hasOwnProperty("backgroundColor") ?
       parameters["backgroundColor"] : { r:255, g:255, b:255, a:1.0 };
+    var textColor = parameters.hasOwnProperty("textColor") ? 
+      parameters["textColor"] : { r: 0, g: 0, b: 0, a: 1.0 };
+    var borderThickness = parameters.hasOwnProperty("borderThickness") ?
+      parameters["borderThickness"] : 4;
+    var borderColor = parameters.hasOwnProperty("borderColor") ? 
+      parameters["borderColor"] : { r: 0, g: 0, b: 0, a: 1.0 };
        
     var canvas = document.createElement('canvas');
-    canvas.width = 256;
-    canvas.height = 256;
     var context = canvas.getContext('2d');
     context.font = fontsize + "px " + fontface;
       
@@ -43,20 +62,25 @@ define(['three'], function(THREE) {
     var metrics = context.measureText( message );
     var textWidth = metrics.width;
     
-    // background color
-    context.fillStyle   = "rgba(" + backgroundColor.r + "," + backgroundColor.g + ","
+    
+    context.fillStyle = "rgba(" + backgroundColor.r + "," + backgroundColor.g + ","
                     + backgroundColor.b + "," + backgroundColor.a + ")";    
-    // text color
-    context.fillStyle = "rgba(0, 0, 0, 1.0)";
-    context.fillText( message, 0, fontsize);
+    context.strokeStyle = "rgba(" + borderColor.r + "," + borderColor.g + "," + borderColor.b + "," + borderColor.a + ")";
+
+    context.lineWidth = borderThickness;
+    roundRect(context, borderThickness / 2, borderThickness / 2, (textWidth + borderThickness) * 1.1, fontsize * 1.4 + borderThickness, 8);
+
+    context.fillStyle = "rgba(" + textColor.r + "," + textColor.g + "," + textColor.b + "," + textColor.a + ")";
+    context.fillText( message, borderThickness, fontsize + borderThickness);
     
     // canvas contents will be used for a texture
     var texture = new THREE.Texture(canvas) 
     texture.needsUpdate = true;
+
     var spriteMaterial = new THREE.SpriteMaterial( { map: texture } );
     var sprite = new THREE.Sprite( spriteMaterial );
-    sprite.scale.set(10,10,1.0);
-    return sprite;  
+    sprite.scale.set(0.5*fontsize, 0.25*fontsize, 0.75*fontsize);
+    return sprite;
   }
 
 

@@ -1,7 +1,7 @@
 define(
-  ['jquery', 'core/core', 'core/utils', 
+  ['jquery', 'three', 'core/core', 'core/utils', 
    'core/geometry', 'core/entities/particle'], 
-  function($, Core, Utils, Geometry, Particle) {
+  function($, THREE, Core, Utils, Geometry, Particle) {
     function Editor() {
       var that = this;
 
@@ -12,13 +12,23 @@ define(
         that.particle.renderObject.position.set(that.particle.position.x, that.particle.position.y, that.particle.position.z);
         that.particle.renderObject.updateMatrix();
       }
-
+ 
       this.makeTextProperty = function(key) {
         var field = $('<input type="text">'), fieldSetter = $('<input type="button" value="Set">');
         field.val(that.particle[key]);
         fieldSetter.click(function(event) {
-          //console.log('wut')
           that.particle[key] = field.val();
+          if (key == 'name') { // TODO: refactor
+            that.particle.renderObject.remove(that.particle.renderObject.getObjectByName('label'));
+
+            var label = Utils.makeTextSprite(that.particle.name, {borderThickness: 1, fontsize:32});
+            label.name = 'label';
+            var tmpbbox = new THREE.Box3().setFromObject(that.particle.renderObject);
+            label.position.x = tmpbbox.getSize().x + 1;
+            label.position.y = tmpbbox.getSize().y + 1;
+            
+            that.particle.renderObject.add(label);
+          }
           that.update();
         });
         return $('<span></span>').append(field).append(fieldSetter);
@@ -32,7 +42,6 @@ define(
             alert("Value must be a float number!");
             return;
           }
-          console.log('wut2')
           that.particle[key] = parseFloat(field.val());
           that.update();
         });

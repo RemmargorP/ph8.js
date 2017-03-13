@@ -42,8 +42,6 @@ define(['jquery', 'three', 'core/geometry', 'uuid', 'core/utils'], function($, T
 
       cur = that.makeHistoryStamp(timestamp);
 
-      console.log(cur);
-
       var update = false;
       update |= cur.name != last.name;
       update |= Math.abs(cur.mass - last.mass) > that.historyOptions.precision;
@@ -57,18 +55,23 @@ define(['jquery', 'three', 'core/geometry', 'uuid', 'core/utils'], function($, T
       }
     }
 
-
-
-
-    var r = radius || 5;
-    var col = color || Utils.getRandomColor();
+    var r = radius || Math.cbrt(mass) * 3;
+    var col = color || Utils.getRandomColor(0.6);
     var geometry = new THREE.SphereGeometry( r, 32, 32 );
     var material = new THREE.MeshBasicMaterial( {color: col} );
     var sphere = new THREE.Mesh( geometry, material );
-    //sphere.__dirtyPosition = true;
+    var label = Utils.makeTextSprite(name, {borderThickness: 1, fontsize:32});
+    label.name = 'label';
+    label.position.x = r+1;
+    label.position.y = r+1;
+    sphere.setLinearVelocity(0.1, 0, 0);
+    sphere.__dirtyPosition = true;
     sphere.__dirtyRotation = true;
     sphere.matrixAutoUpdate = false;
     sphere.position.set(this.position.x, this.position.y, this.position.z);
+    sphere.updateMatrix();
+    sphere.add(label);
+    
 
     this.renderObject = sphere;
 
