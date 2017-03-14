@@ -19,6 +19,9 @@
       <button class="btn btn-default" onclick="cpanel.addPlot2D();">Add Plot 2D</button>
       <button class="btn btn-default" onclick="cpanel.addPlot3D();">Add Plot 3D</button>
       <button class="btn btn-default" onclick="cpanel.openVisualizer();">Open Visualizer</button>
+      <button id="core_state" class="glyphicon glyphicon-play" onclick="cpanel.toggleSimulation();"></button>
+      <span id="clock">Current time:</span>
+      <span>Simulate til: <input id="timer" type="text"><button onclick="cpanel.setSimulationEndingTime();">Set</button></span>
     </div>
 
     <div class="container" style="margin-top:60px;">

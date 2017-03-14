@@ -4,14 +4,6 @@ define(
   function($, THREE, Core, Utils, Geometry, Particle) {
     function Editor() {
       var that = this;
-
-      this.update = function() {
-        //console.log(that.particle);
-        //console.log(that.particle.renderObject.position);
-        that.particle.updateHistory();
-        that.particle.renderObject.position.set(that.particle.position.x, that.particle.position.y, that.particle.position.z);
-        that.particle.renderObject.updateMatrix();
-      }
  
       this.makeTextProperty = function(key) {
         var field = $('<input type="text">'), fieldSetter = $('<input type="button" value="Set">');
@@ -29,7 +21,7 @@ define(
             
             that.particle.renderObject.add(label);
           }
-          that.update();
+          that.particle.update();
         });
         return $('<span></span>').append(field).append(fieldSetter);
       }
@@ -43,7 +35,7 @@ define(
             return;
           }
           that.particle[key] = parseFloat(field.val());
-          that.update();
+          that.particle.update();
         });
         return $('<span></span>').append(field).append(fieldSetter);
       }
@@ -60,7 +52,7 @@ define(
           var tmp = that.particle[key].copy();
           tmp[comp] = parseFloat(field.val());
           that.particle[key] = tmp;
-          that.update();
+          that.particle.update();
         });
         return $('<div>'+comp+'</div>').append(field).append(fieldSetter);
       }

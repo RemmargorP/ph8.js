@@ -10,10 +10,29 @@ define(['jquery', 'three', 'core/geometry', 'uuid', 'core/utils'], function($, T
     this.position = pos || new Geometry.Vector3(0, 0, 0);
     this.velocity = vel || new Geometry.Vector3(0, 0, 0);
 
-    this.currentForce = new Geometry.Vector3(0, 0, 0); // for current step of simulation
+    this.pack = function() {
+      return {
+        id: this.id,
+        name: this.name,
+        mass: this.mass,
+        charge: this.charge,
+        position: this.position.copy(),
+        velocity: this.velocity.copy()
+      }
+    }
+
+    this.unpack = function(p) {
+      p = p || {}
+      if (p.hasOwnProperty('id')) this.id = p.id;
+      if (p.hasOwnProperty('name')) this.name = p.name;
+      if (p.hasOwnProperty('mass')) this.mass = p.mass;
+      if (p.hasOwnProperty('charge')) this.charge = p.charge;
+      if (p.hasOwnProperty('position')) this.position = p.position.copy();
+      if (p.hasOwnProperty('velocity')) this.velocity = p.velocity.copy();
+    }
 
     this.historyOptions = historyOptions || {};
-    this.historyOptions.maxSize = this.historyOptions.maxSize || 10000;
+    this.historyOptions.maxSize = this.historyOptions.maxSize || 1000;
     this.historyOptions.precision = this.historyOptions.precision || 1e-1; // if any of properties changed more than (precision) than save current state
 
     this.history = [];
@@ -64,7 +83,6 @@ define(['jquery', 'three', 'core/geometry', 'uuid', 'core/utils'], function($, T
     label.name = 'label';
     label.position.x = r+1;
     label.position.y = r+1;
-    sphere.setLinearVelocity(0.1, 0, 0);
     sphere.__dirtyPosition = true;
     sphere.__dirtyRotation = true;
     sphere.matrixAutoUpdate = false;
@@ -114,10 +132,15 @@ define(['jquery', 'three', 'core/geometry', 'uuid', 'core/utils'], function($, T
       props.append( $('<tr></tr>').append( $('<td></td>').text(key) ).append( $('<td id="'+key+'"></td>').text(this[key]) ));
     }
 
-
-
     this.DOMs.listRow.append( $('<td></td>').append( $('<table class="table table-bordered"></table>').append(props) ));
 
+
+
+    this.update = function() {
+      that.particle.updateHistory();
+      that.particle.renderObject.position.set(that.particle.position.x, that.particle.position.y, that.particle.position.z);
+      that.particle.renderObject.updateMatrix();
+    }
   }
 
   return Particle;
