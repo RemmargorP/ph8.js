@@ -11,7 +11,7 @@ define(['core/entities/particle'], function(Particle) {
     this.id = source.id + '_gravity';
   }
   GravityField.prototype.G = 66740831313131e-11;
-  GravityField.prototype.G = 66740831313131e-1;
+  GravityField.prototype.G = 66740831313131e-9;
   GravityField.prototype.impactOn = function(particle, options) {
     if (options != undefined) {
       if (options.id == particle.id) return new Vector3(0, 0, 0);

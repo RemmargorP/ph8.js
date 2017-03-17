@@ -43,7 +43,7 @@ define(
       };
 
       this.addEntity = function() {
-        var p = new Particle(this.generateId(), Math.random(), Math.random(), new Geometry.Vector3(Math.random()*100, Math.random()*100, Math.random()*100));
+        var p = new Particle(this.generateId(), 9+Math.random(), Math.random(), new Geometry.Vector3(Math.random()*100, Math.random()*100, Math.random()*100));
 
         $('#particles').append(p.DOMs.listRow);
 

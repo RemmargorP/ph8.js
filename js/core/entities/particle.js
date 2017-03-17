@@ -27,8 +27,8 @@ define(['jquery', 'three', 'core/geometry', 'uuid', 'core/utils'], function($, T
       if (p.hasOwnProperty('name')) this.name = p.name;
       if (p.hasOwnProperty('mass')) this.mass = p.mass;
       if (p.hasOwnProperty('charge')) this.charge = p.charge;
-      if (p.hasOwnProperty('position')) this.position = p.position.copy();
-      if (p.hasOwnProperty('velocity')) this.velocity = p.velocity.copy();
+      if (p.hasOwnProperty('position')) this.position = new Geometry.Vector3(p.position.x, p.position.y, p.position.z);
+      if (p.hasOwnProperty('velocity')) this.velocity = new Geometry.Vector3(p.velocity.x, p.velocity.y, p.velocity.z);
     }
 
     this.historyOptions = historyOptions || {};
@@ -137,9 +137,8 @@ define(['jquery', 'three', 'core/geometry', 'uuid', 'core/utils'], function($, T
 
 
     this.update = function() {
-      that.particle.updateHistory();
-      that.particle.renderObject.position.set(that.particle.position.x, that.particle.position.y, that.particle.position.z);
-      that.particle.renderObject.updateMatrix();
+      this.renderObject.position.set(this.position.x, this.position.y, this.position.z);
+      this.renderObject.updateMatrix();
     }
   }
 

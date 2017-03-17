@@ -43,7 +43,7 @@ define(['weaver', 'core/geometry', 'core/entities/field'], function(Weaver, Geom
     }
 
     this.simulateOne = function(data) {
-      var fields = data[0], particle = data[1], deltaT = data[2];
+      var fields = packedFields, particle = data[0], deltaT = data[1];
       particle.position = new Vector3(particle.position.x, particle.position.y, particle.position.z);
       particle.velocity = new Vector3(particle.velocity.x, particle.velocity.y, particle.velocity.z);
       var force = new Vector3(0, 0, 0);
@@ -67,9 +67,10 @@ define(['weaver', 'core/geometry', 'core/entities/field'], function(Weaver, Geom
         await (function() { return new Promise(resolve => setTimeout(resolve, 100))})();
         console.log('Waiting...');
         while (this.running && this.time < this.simulateTil) {
-          if (this.time - prevLogTime > 1) {
-            console.log('Running ' + this.time + '/' + this.simulateTil);
+          if (this.time - prevLogTime > 0.01) {
+            //console.log('Running ' + this.time + '/' + this.simulateTil);
             prevLogTime = this.time;
+            $('#clock').text('Current time: ' + this.time);
           }
           var results = [], data = [], packedFields = [];
           for (var key in this.fields) {
@@ -77,27 +78,31 @@ define(['weaver', 'core/geometry', 'core/entities/field'], function(Weaver, Geom
           }
           for (var key in this.particles) {
             var p = this.particles[key];
-            data.push([packedFields, p.pack(), this.step]);
+            data.push([p.pack(), this.step]);
           }
+
+          this.fabric.require(packedFields, 'packedFields');
           //console.log(data);
           //require(this.fields, 'fields').
 
-          this.fabric.pass(data).map(this.simulateOne).then(function(nextstate) {
-            results.push(nextstate);
+          await this.fabric.pass(data).map(this.simulateOne).then(function(nextstates) {
+            results = nextstates;
           });
           this.time += this.step;
-          await (async function() {
-            while (results.length != this.particles.length);
-          })
+          //await (async function() {
+          //  while (results.length != this.particles.length);
+          //})
           for (var key in results) {
-            this.particles[results[key].id].unpack(r);
+            this.particles[results[key].id].unpack(results[key]);
           }
           for (var key in this.particles) {
             var p = this.particles[key];
             p.position = p.position.add(p.velocity.mul(this.step));
             p.updateHistory(this.time);
+            p.update();
           }
         }
+        $('#clock').text('Current time: ' + this.time);
       }
     }
   }
