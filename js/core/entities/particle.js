@@ -1,4 +1,5 @@
-define(['jquery', 'three', 'core/geometry', 'uuid', 'core/utils'], function($, THREE, Geometry, UUID, Utils) {
+define(['jquery', 'three', 'core/geometry', 'uuid', 'core/utils', 'loaders/MTLLoader', 'loaders/OBJLoader'], 
+        function($, THREE, Geometry, UUID, Utils, MTLLoader, OBJLoader) {
 
   function Particle(name, mass, charge, pos, vel, radius, color, historyOptions) {
     var that = this;
@@ -32,8 +33,8 @@ define(['jquery', 'three', 'core/geometry', 'uuid', 'core/utils'], function($, T
     }
 
     this.historyOptions = historyOptions || {};
-    this.historyOptions.maxSize = this.historyOptions.maxSize || 1000;
-    this.historyOptions.precision = this.historyOptions.precision || 1e-1; // if any of properties changed more than (precision) than save current state
+    this.historyOptions.maxSize = this.historyOptions.maxSize || 500;
+    this.historyOptions.precision = this.historyOptions.precision || 1e1; // if any of properties changed more than (precision) then save current state
 
     this.history = [];
 
@@ -74,7 +75,7 @@ define(['jquery', 'three', 'core/geometry', 'uuid', 'core/utils'], function($, T
       }
     }
 
-    var r = radius || Math.cbrt(mass) * 3;
+    var r = radius || Math.cbrt(mass) * 0.33;
     var col = color || Utils.getRandomColor(0.6);
     var geometry = new THREE.SphereGeometry( r, 32, 32 );
     var material = new THREE.MeshBasicMaterial( {color: col} );
@@ -89,9 +90,35 @@ define(['jquery', 'three', 'core/geometry', 'uuid', 'core/utils'], function($, T
     sphere.position.set(this.position.x, this.position.y, this.position.z);
     sphere.updateMatrix();
     sphere.add(label);
-    
 
-    this.renderObject = sphere;
+    /*/////////////////////
+    var mtlLoader = new THREE.MTLLoader();
+    mtlLoader.setPath( 'scenes/models/cat/' );
+    mtlLoader.load( 'cat.mtl', function( materials ) {
+      materials.preload();
+      var objLoader = new THREE.OBJLoader();
+      objLoader.setMaterials( materials );
+      objLoader.setPath( 'scenes/models/cat/' );
+      objLoader.load( 'cat.obj', function ( object ) {
+        object.__dirtyPosition = true;
+        object.__dirtyRotation = true;
+        object.matrixAutoUpdate = false;
+        object.position.set(that.position.x, that.position.y, that.position.z);
+        object.updateMatrix();
+        that.renderObject = object;
+      });
+    });
+
+    (async function() {
+      while (!that.renderObject) {
+        await (new Promise(resolve => setTimeout(resolve, 30)));
+      };
+    })();
+    /////////////////////
+*/
+     this.renderObject = sphere;
+
+    
 
     // Web controls
     this.DOMs = {};

@@ -43,14 +43,18 @@ define(
       };
 
       this.addEntity = function() {
-        var p = new Particle(this.generateId(), 9+Math.random(), Math.random(), new Geometry.Vector3(Math.random()*100, Math.random()*100, Math.random()*100));
+        var p = new Particle(this.generateId(), 1000*Math.random(), Math.random()*1e-7, new Geometry.Vector3(Math.random()*100, Math.random()*100, Math.random()*100));
 
         $('#particles').append(p.DOMs.listRow);
 
         var gravity = new Fields.GravityField(p);
+        var repulsion = new Fields.RepulsionField(p);
+        var electromagnetic = new Fields.ElectroMagneticField(p);
 
         this.core.addParticle(p);
         this.core.addField(gravity);
+        this.core.addField(repulsion);
+        this.core.addField(electromagnetic);
         this.scene.add(p.renderObject);
       }
       this.addPlot2D = function() {}
