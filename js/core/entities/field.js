@@ -45,7 +45,7 @@ define(['core/entities/particle', 'core/geometry'], function(Particle, Geometry)
       var v = particle.position.sub(this.source.position);
       return v.mul(this.alpha / Math.pow(v.len(), 6)); // v * (1 / v^6) => v^-5 // TODO: подгон (?)
   }
-  RepulsionField.prototype.alpha = 1/130;
+  RepulsionField.prototype.alpha = 1e9;
   RepulsionField.prototype.__id = 'RepulsionField';
   RepulsionField.prototype.pack = function() {
     return [this.__id, this.source.pack()];

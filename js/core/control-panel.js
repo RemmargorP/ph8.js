@@ -54,7 +54,7 @@ define(
         this.core.addParticle(p);
         this.core.addField(gravity);
         this.core.addField(repulsion);
-        this.core.addField(electromagnetic);
+        //this.core.addField(electromagnetic);
         this.scene.add(p.renderObject);
       }
       this.addPlot2D = function() {}

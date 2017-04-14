@@ -75,7 +75,7 @@ define(['jquery', 'three', 'core/geometry', 'uuid', 'core/utils', 'loaders/MTLLo
       }
     }
 
-    var r = radius || Math.cbrt(mass) * 0.33;
+    var r = radius || Math.cbrt(mass) * 1/15;
     var col = color || Utils.getRandomColor(0.6);
     var geometry = new THREE.SphereGeometry( r, 32, 32 );
     var material = new THREE.MeshBasicMaterial( {color: col} );
