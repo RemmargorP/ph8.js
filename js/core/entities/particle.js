@@ -75,15 +75,15 @@ define(['jquery', 'three', 'core/geometry', 'uuid', 'core/utils', 'loaders/MTLLo
       }
     }
 
-    var r = radius || Math.cbrt(mass) * 1/15;
+    var r = radius || Math.cbrt(mass) * 1/20;
     var col = color || Utils.getRandomColor(0.6);
     var geometry = new THREE.SphereGeometry( r, 32, 32 );
     var material = new THREE.MeshBasicMaterial( {color: col} );
     var sphere = new THREE.Mesh( geometry, material );
-    var label = Utils.makeTextSprite(name, {borderThickness: 1, fontsize:32});
+    var label = Utils.makeTextSprite(name, {borderThickness: 1, fontsize:18});
     label.name = 'label';
-    label.position.x = r+1;
-    label.position.y = r+1;
+    label.position.x = r+0.5;
+    label.position.y = r+0.5;
     sphere.__dirtyPosition = true;
     sphere.__dirtyRotation = true;
     sphere.matrixAutoUpdate = false;
