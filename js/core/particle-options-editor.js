@@ -24,7 +24,7 @@ define(
           that.particle.update();
         });
         return $('<span></span>').append(field).append(fieldSetter);
-      }
+      };
 
       this.makeFloatProperty = function(key) {
         var field = $('<input type="text">'), fieldSetter = $('<input type="button" value="Set">');
@@ -38,7 +38,7 @@ define(
           that.particle.update();
         });
         return $('<span></span>').append(field).append(fieldSetter);
-      }
+      };
 
       this.makeVector3ComponentProperty = function(key, comp) {
         var field = $('<input type="text">'), fieldSetter = $('<input type="button" value="Set">');
@@ -55,14 +55,14 @@ define(
           that.particle.update();
         });
         return $('<div>'+comp+'</div>').append(field).append(fieldSetter);
-      }
+      };
 
       this.makeVector3Property = function(key) {
         var x = that.makeVector3ComponentProperty(key, 'x'),
             y = that.makeVector3ComponentProperty(key, 'y'),
             z = that.makeVector3ComponentProperty(key, 'z');
         return $('<span></span>').append(x).append(y).append(z);
-      }
+      };
 
       this.init = function() {
         if (particle != undefined) {
@@ -76,10 +76,10 @@ define(
 
           var $props = $('tbody');
 
-          $props.append( $('<tr></tr>').append( $('<td></td>').text('Name') ).append( $('<td></td>').append(that.makeTextProperty('name') ) ) )
-          $props.append( $('<tr></tr>').append( $('<td></td>').text('Mass') ).append( $('<td></td>').append(that.makeFloatProperty('mass') ) ) )
-          $props.append( $('<tr></tr>').append( $('<td></td>').text('Charge') ).append( $('<td></td>').append(that.makeFloatProperty('charge') ) ) )
-          $props.append( $('<tr></tr>').append( $('<td></td>').text('Position') ).append( $('<td></td>').append(that.makeVector3Property('position') ) ) )
+          $props.append( $('<tr></tr>').append( $('<td></td>').text('Name') ).append( $('<td></td>').append(that.makeTextProperty('name') ) ) );
+          $props.append( $('<tr></tr>').append( $('<td></td>').text('Mass') ).append( $('<td></td>').append(that.makeFloatProperty('mass') ) ) );
+          $props.append( $('<tr></tr>').append( $('<td></td>').text('Charge') ).append( $('<td></td>').append(that.makeFloatProperty('charge') ) ) );
+          $props.append( $('<tr></tr>').append( $('<td></td>').text('Position') ).append( $('<td></td>').append(that.makeVector3Property('position') ) ) );
           $props.append( $('<tr></tr>').append( $('<td></td>').text('Velocity') ).append( $('<td></td>').append(that.makeVector3Property('velocity') ) ) )
 
         } else {

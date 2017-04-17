@@ -1,4 +1,4 @@
-define(['weaver', 'core/geometry', 'core/entities/field'], function(Weaver, Geometry, Fields) {
+define(['core/geometry', 'core/entities/field'], function(Geometry, Fields) {
   function Core() {
     var that = this;
 
@@ -6,60 +6,75 @@ define(['weaver', 'core/geometry', 'core/entities/field'], function(Weaver, Geom
     this.fields = {};
     this.diffcheck = {};
 
+    this.configFields = [];
+
     this.time = 0;
     this.maxStep = 0.05;
     this.step = 0.001;
     this.running = false;
-    this.simulateTil = 0; // time
-    this.realTimePerStepMul = 1;
+    this.simulateTil = 0;
+    this.simulatePerRealSec = 1;
     this.precision = 1e-5;
-
-    this.fabric = Weaver.fabric();
-
-    for (var fg in Fields) {
-      this.fabric.require(Fields[fg]);
-    }
-    this.fabric.require(Geometry.Vector3);
 
     this.addParticle = function(particle) {
       this.particles[particle.id] = particle;
-    }
-    this.addField = function(field) {
-      this.fields[field.id] = field;
-    }
+    };
+    this.addField = function(field_id, particle_id) {
+      var f;
+      if (particle_id)
+        f = new Fields[field_id](this.particles[particle_id]);
+      else 
+        f = new Fields[field_id]();
+
+      this.fields[f.id] = f;
+      this.configFields.push({field_id, particle_id})
+    };
 
     this.stop = function() {
       this.running = false;
-    }
+    };
 
     this.continue = function() {
       if (this.simulateTil > this.time)
         this.running = true;
-    }
+    };
 
     this.setSimulationEndingTime = function(time) {
       this.simulateTil = time;
-    }
+    };
 
     this.setPrecision = function(precision) {
       this.precision = precision;
-    }
+    };
 
     this.simulateOne = function(particle, deltaT) {
-      /* MULTITHREAD 
-      var fields = packedFields, particle = data[0], deltaT = data[1];
-      particle.position = new Vector3(particle.position.x, particle.position.y, particle.position.z);
-      particle.velocity = new Vector3(particle.velocity.x, particle.velocity.y, particle.velocity.z);
-      */
       var force = new Geometry.Vector3(0, 0, 0);
-      for (key in that.fields) {
+      for (var key in that.fields) {
         force = force.add(that.fields[key].impactOn(particle));
       }
       var acceleration = force.mul(1 / particle.mass);
-      var deltaV = acceleration.mul(deltaT);
 
       particle.acceleration = acceleration;
       return particle;
+    };
+
+    this.serialize = function() {
+      var data = {
+        time: this.time,
+        maxStep: this.maxStep,
+        step: this.step,
+        simulateTil: this.simulateTil,
+        simulatePerRealSec: this.simulatePerRealSec,
+        precision: this.precision,
+        fields: configFields,
+        particles: {}
+      }
+
+      for (var key in this.particles) {
+        data.particles[key.id] = this.particles[key].serialize();
+      }
+
+      return data;
     }
 
     this.simulate = async function() {
@@ -67,49 +82,24 @@ define(['weaver', 'core/geometry', 'core/entities/field'], function(Weaver, Geom
       var simulationStartTime = new Date();
       var stepIter = 0;
       while (1) {
-        await (function() { return new Promise(resolve => setTimeout(resolve, 100))})();
+        await (function() { return new Promise(resolve => setTimeout(resolve, 300))})(); // 0.3 sec sleep
         console.log('Waiting...');
         while (this.running && this.time < this.simulateTil) {
           stepIter++;
 
           var startTime = new Date();
 
-          /* MULTITHREAD - too raw implementation, too slow
-          var results = [], data = [], packedFields = [];
-          for (var key in this.fields) {
-            packedFields.push(this.fields[key].pack());
-          }
-          for (var key in this.particles) {
-            var p = this.particles[key];
-            data.push([p.pack(), curStep]);
-          }
-
-          this.fabric.require(packedFields, 'packedFields');
-          console.log(data);
-          require(this.fields, 'fields');
-          await this.fabric.pass(data).map(this.simulateOne).then(function(nextstates) {
-            results = nextstates;
-          });
-
-          await (async function() {
-            while (results.length != this.particles.length);
-          })
-          for (var key in results) {
-            this.particles[results[key].id].unpack(results[key]);
-          }
-          */
-
-          if (stepIter % 200 == 0) this.step = Math.min(this.step * 2, this.maxStep);
+          if (stepIter % 100 == 0) this.step = Math.min(this.step * 2, this.maxStep);
 
           var ok = false, firstTime = true;
 
           while (!ok) {
-            var p, poss;
+            var p, poss, p1, p2, vp1, vp2, pp1, pp2;
             if (firstTime) {
               for (var key in this.particles) {
                 p = this.particles[key];
 
-                p.restore = p.pack();
+                p.restore = p.serialize();
                 this.simulateOne(p, this.step);
               }
               for (var key in this.particles) {
@@ -118,8 +108,8 @@ define(['weaver', 'core/geometry', 'core/entities/field'], function(Weaver, Geom
                 p.position = p.position.add(p.velocity.mul(this.step)).add(p.acceleration.mul(this.step*this.step * 0.5));
                 p.velocity = p.velocity.add(p.acceleration.mul(this.step));
 
-                this.diffcheck[p.id] = p.pack();
-                p.unpack(p.restore);
+                this.diffcheck[p.id] = p.serialize();
+                p.deserialize(p.restore);
               }
               firstTime = false;
             }
@@ -145,11 +135,17 @@ define(['weaver', 'core/geometry', 'core/entities/field'], function(Weaver, Geom
             ok = true;
 
             for (var key in this.particles) {
-              p = this.particles[key].pack();
+              p = this.particles[key];
               poss = this.diffcheck[p.id];
 
-              if (p.position.sub(poss.position).len() > this.precision ||
-                  p.velocity.sub(poss.velocity).len() > this.precision ||
+              pp1 = p.position;
+              vp1 = p.velocity;
+
+              pp2 = new Geometry.Vector3().deserialize(poss.position);
+              vp2 = new Geometry.Vector3().deserialize(poss.velocity);
+
+              if (p.position.sub(poss.position).len2() > this.precision*this.precision ||
+                  p.velocity.sub(poss.velocity).len2() > this.precision*this.precision ||
                   Math.abs(p.charge - poss.charge) > this.precision ||
                   Math.abs(p.mass - poss.mass) > this.precision) {
                 ok = false;
@@ -164,7 +160,6 @@ define(['weaver', 'core/geometry', 'core/entities/field'], function(Weaver, Geom
           
           for (var key in this.particles) {
             var p = this.particles[key];
-            p.position = p.position.add(p.velocity.mul(this.step));
             p.updateHistory(this.time);
             p.update();
           }
@@ -177,19 +172,17 @@ define(['weaver', 'core/geometry', 'core/entities/field'], function(Weaver, Geom
 
           var endTime = new Date();
 
-          if (endTime - startTime < 1000 * this.realTimePerStepMul) {
-            await (function() { return new Promise(resolve => setTimeout(resolve, this.step * this.realTimePerStepMul - (endTime - startTime)))})();
+          if (0.001 * (endTime - startTime) < this.simulatePerRealSec * this.step) {
+            await (function() { return new Promise(resolve => setTimeout(resolve, this.step * this.simulatePerRealSec - 0.001*(endTime - startTime)))})();;
           }
         }
         $('#clock').text('Current time: ' + this.time);
       }
     }
 
-    this.save = function() {
-    }
   }
 
   return {
     Core: Core,
   }
-})
+});

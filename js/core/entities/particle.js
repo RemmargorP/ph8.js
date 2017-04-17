@@ -1,54 +1,83 @@
-define(['jquery', 'three', 'core/geometry', 'uuid', 'core/utils', 'loaders/MTLLoader', 'loaders/OBJLoader'], 
-        function($, THREE, Geometry, UUID, Utils, MTLLoader, OBJLoader) {
+define(['jquery', 'core/geometry', 'uuid', 'core/utils', 'core/entities/representation3D'],
+        function($, Geometry, UUID, Utils, Representation3D) {
 
-  function Particle(name, mass, charge, pos, vel, radius, color, historyOptions) {
+  /*
+  * config:
+  *   - uuid
+  *   - name
+  *   - mass
+  *   - charge
+  *   - position (Vector3)
+  *   - velocity (Vector3)
+  *   - history:
+  *       - maxSize (default: 500)
+  *       - precision (default: 10)
+  *
+  * supposed that name and id doesn't change while simulating
+  */
+
+  function Particle(config) {
+    config = config || {};
+
     var that = this;
 
-    this.id = UUID();
-    this.name = name || '';
-    this.mass = mass || 0;
-    this.charge = charge || 0;
-    this.position = pos || new Geometry.Vector3(0, 0, 0);
-    this.velocity = vel || new Geometry.Vector3(0, 0, 0);
+    this.id = config.uuid || UUID();
+    this.name = config.name || '';
+    this.mass = config.mass || 0;
+    this.charge = config.charge || 0;
+    this.position = config.position || new Geometry.Vector3(0, 0, 0);
+    this.velocity = config.velocity || new Geometry.Vector3(0, 0, 0);
 
-    this.pack = function() {
-      return {
-        id: this.id,
-        name: this.name,
-        mass: this.mass,
-        charge: this.charge,
-        position: this.position.copy(),
-        velocity: this.velocity.copy()
-      }
-    }
-
-    this.unpack = function(p) {
-      p = p || {}
-      if (p.hasOwnProperty('id')) this.id = p.id;
-      if (p.hasOwnProperty('name')) this.name = p.name;
-      if (p.hasOwnProperty('mass')) this.mass = p.mass;
-      if (p.hasOwnProperty('charge')) this.charge = p.charge;
-      if (p.hasOwnProperty('position')) this.position = new Geometry.Vector3(p.position.x, p.position.y, p.position.z);
-      if (p.hasOwnProperty('velocity')) this.velocity = new Geometry.Vector3(p.velocity.x, p.velocity.y, p.velocity.z);
-    }
-
-    this.historyOptions = historyOptions || {};
+    this.historyOptions = config.history || {};
     this.historyOptions.maxSize = this.historyOptions.maxSize || 500;
     this.historyOptions.precision = this.historyOptions.precision || 1e1; // if any of properties changed more than (precision) then save current state
 
     this.history = [];
 
+    this.serialize = function(verbose) {
+      verbose = verbose || 0;
+
+      var data = {
+        id: this.id,
+        name: this.name,
+        mass: this.mass,
+        charge: this.charge,
+        position: this.position.serialize(),
+        velocity: this.velocity.serialize()
+      };
+
+      if (verbose >= 1) {
+        data.history = this.history;
+        data.representation = this.representation.serialize();
+      }
+      return data;
+    };
+
+    this.deserialize = function(p) {
+      p = p || {};
+      if (p.hasOwnProperty('id')) this.id = p.id;
+      if (p.hasOwnProperty('name')) this.name = p.name;
+      if (p.hasOwnProperty('mass')) this.mass = p.mass;
+      if (p.hasOwnProperty('charge')) this.charge = p.charge;
+      if (p.hasOwnProperty('position')) this.position = (new Geometry.Vector3()).deserialize(p.position);
+      if (p.hasOwnProperty('velocity')) this.velocity = (new Geometry.Vector3()).deserialize(p.velocity);
+      if (p.hasOwnProperty('history')) this.history = p.history;
+      if (p.hasOwnProperty('representation')) {
+        this.representation = new Representation3D();
+        this.representation.deserialize(p.representation);
+      }
+    };
+
     this.makeHistoryStamp = function(timestamp) {
       return {
         time: timestamp,
-        name: that.name,
         mass: that.mass,
         charge: that.charge,
-        position: that.position,
-        velocity: that.velocity,
+        position: that.position.serialize(),
+        velocity: that.velocity.serialize(),
       }
-    }
-    this.history[0] = this.makeHistoryStamp(-1);
+    };
+    this.history[0] = this.makeHistoryStamp(0);
 
     this.updateHistory = function(timestamp) {
       if (that.history.length == 0) {
@@ -62,63 +91,32 @@ define(['jquery', 'three', 'core/geometry', 'uuid', 'core/utils', 'loaders/MTLLo
 
       cur = that.makeHistoryStamp(timestamp);
 
+      var curp = (new Geometry.Vector3()).deserialize(cur.position),
+          curv = (new Geometry.Vector3()).deserialize(cur.velocity);
+
       var update = false;
-      update |= cur.name != last.name;
       update |= Math.abs(cur.mass - last.mass) > that.historyOptions.precision;
-      update |= cur.position.sub(last.position).len() > that.historyOptions.precision;
-      // update |= cur.velocity.sub(last.velocity).len() > that.historyOptions.precision; // not necessary
+      update |= curp.sub(last.position).len() > that.historyOptions.precision;
+      update |= curv.sub(last.velocity).len() > that.historyOptions.precision;
 
       if (update) {
-        that.history[that.history.length] = cur;
+        that.history.push(cur);
         if (that.history.length > that.historyOptions.maxSize)
           that.history = that.history.slice(that.history.length - that.historyOptions.maxSize);
       }
+    };
+
+    var r = 1;
+    var col = Utils.getRandomColor(0.6);
+
+    this.representation = new Representation3D();
+    this.representation.addBasicMesh(r, col);
+    this.representation.addLabel(this.name); 
+
+    this.update = function() {
+      this.representation.update(this.position);
     }
-
-    var r = radius || Math.cbrt(mass) * 1/15;
-    var col = color || Utils.getRandomColor(0.6);
-    var geometry = new THREE.SphereGeometry( r, 32, 32 );
-    var material = new THREE.MeshBasicMaterial( {color: col} );
-    var sphere = new THREE.Mesh( geometry, material );
-    var label = Utils.makeTextSprite(name, {borderThickness: 1, fontsize:32});
-    label.name = 'label';
-    label.position.x = r+1;
-    label.position.y = r+1;
-    sphere.__dirtyPosition = true;
-    sphere.__dirtyRotation = true;
-    sphere.matrixAutoUpdate = false;
-    sphere.position.set(this.position.x, this.position.y, this.position.z);
-    sphere.updateMatrix();
-    sphere.add(label);
-
-    /*/////////////////////
-    var mtlLoader = new THREE.MTLLoader();
-    mtlLoader.setPath( 'scenes/models/cat/' );
-    mtlLoader.load( 'cat.mtl', function( materials ) {
-      materials.preload();
-      var objLoader = new THREE.OBJLoader();
-      objLoader.setMaterials( materials );
-      objLoader.setPath( 'scenes/models/cat/' );
-      objLoader.load( 'cat.obj', function ( object ) {
-        object.__dirtyPosition = true;
-        object.__dirtyRotation = true;
-        object.matrixAutoUpdate = false;
-        object.position.set(that.position.x, that.position.y, that.position.z);
-        object.updateMatrix();
-        that.renderObject = object;
-      });
-    });
-
-    (async function() {
-      while (!that.renderObject) {
-        await (new Promise(resolve => setTimeout(resolve, 30)));
-      };
-    })();
-    /////////////////////
-*/
-     this.renderObject = sphere;
-
-    
+    this.update();
 
     // Web controls
     this.DOMs = {};
@@ -138,13 +136,13 @@ define(['jquery', 'three', 'core/geometry', 'uuid', 'core/utils', 'loaders/MTLLo
       that.DOMs.listRow.find('#charge').text(that.charge);
       that.DOMs.listRow.find('#position').text(that.position);
       that.DOMs.listRow.find('#velocity').text(that.velocity);
-    })
+    });
 
     this.DOMs.listRow = $('<tr></tr>');
 
     this.DOMs.listRow.click(function() {
       $(this).find('td table').toggleClass('hidden');
-    })
+    });
     
     var domname = $('<td></td>');
     domname.append(this.DOMs.refreshListRow);
@@ -160,14 +158,7 @@ define(['jquery', 'three', 'core/geometry', 'uuid', 'core/utils', 'loaders/MTLLo
     }
 
     this.DOMs.listRow.append( $('<td></td>').append( $('<table class="table table-bordered"></table>').append(props) ));
-
-
-
-    this.update = function() {
-      this.renderObject.position.set(this.position.x, this.position.y, this.position.z);
-      this.renderObject.updateMatrix();
-    }
   }
 
   return Particle;
-})
+});
