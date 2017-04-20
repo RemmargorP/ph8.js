@@ -152,6 +152,13 @@ define(
 
       this.load = function(data) {
         that.core.deserialize(data);
+
+        for (var key in that.core.particles) {
+          var p = that.core.particles[key];
+          p.generateDOMs();
+          $('#particles').append(p.DOMs.listRow);
+          that.scene.add(p.representation.renderGroup);
+        }
       };
 
       this.readConfigFile = function(e) {

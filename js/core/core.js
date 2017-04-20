@@ -92,7 +92,6 @@ define(['core/geometry', 'core/entities/field', 'core/entities/particle'], funct
     }
 
     this.deserialize = function(data) {
-      console.log(data);
       that.time = data.time;
       that.maxStep = data.maxStep;
       that.step = data.step;
@@ -103,7 +102,12 @@ define(['core/geometry', 'core/entities/field', 'core/entities/particle'], funct
       for (var key in data.particles) {
         var p = new Particle();
         p.deserialize(data.particles[key]);
-        console.log(p);
+        that.addParticle(p);
+      }
+      for (var key in data.fields) {
+        var f = data.fields[key];
+
+        that.addField(f[0], f[1]);
       }
 
     };

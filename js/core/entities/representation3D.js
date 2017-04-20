@@ -66,7 +66,6 @@ define(['three', 'core/utils', 'loaders/MTLLoader', 'loaders/OBJLoader', 'loader
 
       for (var key in dump) {
         var prop = dump[key], opts;
-        console.log(prop);
         if ('addBasicMesh' in prop) {
           opts = prop['addBasicMesh'];
           this.addBasicMesh(opts.radius, opts.color);
