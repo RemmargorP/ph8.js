@@ -1,15 +1,25 @@
 define(
   ['jquery', 'three', 'core/core', 'core/utils', 
-   'core/geometry', 'core/entities/particle', 'core/entities/field'], 
-  function($, THREE, Core, Utils, Geometry, Particle, Fields) {
+   'core/geometry', 'core/entities/particle', 'core/entities/field',
+   'FileSaver'], 
+  function($, THREE, Core, Utils, Geometry, Particle, Fields, saveAs) {
     function ControlPanel() {
       var that = this;
 
       this.generateId = Utils.generateId;
       this.scene = new THREE.Scene();
 
-      this.scene.add(new THREE.AxisHelper(500000));
+      this.scene.add(new THREE.AxisHelper(50000000));
+      this.scene.add( new THREE.AmbientLight( 0x404040 ) );
 
+{
+              var directionalLight = new THREE.DirectionalLight( 0xeeeeee );
+        directionalLight.position.x = 1;
+        directionalLight.position.y = 0;
+        directionalLight.position.z = 0;
+        directionalLight.position.normalize();
+        this.scene.add( directionalLight );
+}
       this.core = new Core.Core();
 
       this.runSimulation = async function() {
@@ -68,9 +78,15 @@ define(
             name: 'Earth',
             mass: 6e24,
             charge: 0,
-            position: new Geometry.Vector3(0, 0, 0),
+            radius: 6400000,
+            position: new Geometry.Vector3(-6400100, 0, 0),
             velocity: new Geometry.Vector3(0, 0, 0),
           });
+
+          Earth.representation.addModel('earth', 5900000);
+          Earth.representation.addLabel('Earth', {x:10, y:10, z:10});
+
+          Earth.generateDOMs();
 
           this.core.addParticle(Earth);
           this.core.addField('GravityField', Earth.id);
@@ -81,18 +97,25 @@ define(
         }
 
         {
-          var human = new Particle({
-            name: 'Human',
-            mass: 70,
+          var Moon = new Particle({
+            name: 'Moon',
+            mass: 7.3e22,
             charge: 0,
-            position: new Geometry.Vector3(200, 0, 0),
-            velocity: new Geometry.Vector3(0, 0, 0),
+            radius: 1738e3,
+            position: new Geometry.Vector3(385e6, 0, 0),
+            velocity: new Geometry.Vector3(0, 1.02e3, 0),
           });
 
-          $('#particles').append(human.DOMs.listRow);
+          Moon.representation.addModel('moon', 1738e3);
 
-          this.core.addParticle(human);
-          that.scene.add(human.representation.renderGroup);
+          Moon.generateDOMs();
+
+          this.core.addParticle(Moon);
+          this.core.addField('GravityField', Moon.id);
+          this.core.addField('RepulsionField', Moon.id);
+
+          $('#particles').append(Moon.DOMs.listRow);
+          that.scene.add(Moon.representation.renderGroup);
         }
 
       };
@@ -104,12 +127,38 @@ define(
         winVisualizer.scene = that.scene;
       };
 
-      this.init = function() {
+      this.save = function(filename) {
+        var data = this.core.serialize();
+
+        var blob = new Blob([JSON.stringify(data, null, 2)], {type: "application/json"});
+        
+        saveAs(blob, filename);
       };
 
-      this.save = function() {
-        console.log(this.core.serialize());
-      }
+      this.load = function(data) {
+        that.core.deserialize(data);
+      };
+
+      this.readConfigFile = function(e) {
+        var file = e.target.files[0];
+        if (!file) {
+          return;
+        }
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          var contents = e.target.result;
+          that.load(JSON.parse(contents));
+        };
+        reader.readAsText(file);
+      };
+
+      this.init = function() {
+        $('#loadfromconfigfile').on('change', this.readConfigFile);
+        $('#savetoconfigfile').on('click', function() {
+          var filename = prompt('Config filename:');
+          if (filename) that.save(filename);
+        })
+      };
     }
 
     document.cpanel = new ControlPanel();

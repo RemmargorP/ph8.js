@@ -1,4 +1,4 @@
-define(['core/geometry', 'core/entities/field'], function(Geometry, Fields) {
+define(['core/geometry', 'core/entities/field', 'core/entities/particle'], function(Geometry, Fields, Particle) {
   function Core() {
     var that = this;
 
@@ -9,8 +9,8 @@ define(['core/geometry', 'core/entities/field'], function(Geometry, Fields) {
     this.configFields = [];
 
     this.time = 0;
-    this.maxStep = 0.05;
-    this.step = 0.001;
+    this.maxStep = 500;
+    this.step = 1;
     this.running = false;
     this.simulateTil = 0;
     this.simulatePerRealSec = 1;
@@ -18,6 +18,14 @@ define(['core/geometry', 'core/entities/field'], function(Geometry, Fields) {
 
     this.addParticle = function(particle) {
       this.particles[particle.id] = particle;
+    };
+    this.removeParticle = function(id) {
+      for (var key in this.fields) {
+        if (this.fields[key].source && this.fields[key].source.id == id) {
+          delete this.fields[key];
+        }
+      }
+      delete this.particles[id];
     };
     this.addField = function(field_id, particle_id) {
       var f;
@@ -27,7 +35,7 @@ define(['core/geometry', 'core/entities/field'], function(Geometry, Fields) {
         f = new Fields[field_id]();
 
       this.fields[f.id] = f;
-      this.configFields.push({field_id, particle_id})
+      this.configFields.push([field_id, particle_id])
     };
 
     this.stop = function() {
@@ -66,16 +74,39 @@ define(['core/geometry', 'core/entities/field'], function(Geometry, Fields) {
         simulateTil: this.simulateTil,
         simulatePerRealSec: this.simulatePerRealSec,
         precision: this.precision,
-        fields: configFields,
+        fields: [],
         particles: {}
       }
 
       for (var key in this.particles) {
-        data.particles[key.id] = this.particles[key].serialize();
+        if (this.particles[key] && !this.particles[key].removed)
+          data.particles[key] = this.particles[key].serialize(true);
+      }
+
+      for (var key in this.configFields) {
+        if (this.particles[this.configFields[key][1]] && !this.particles[this.configFields[key][1]].removed)
+          data.fields.push(this.configFields[key]);
       }
 
       return data;
     }
+
+    this.deserialize = function(data) {
+      console.log(data);
+      that.time = data.time;
+      that.maxStep = data.maxStep;
+      that.step = data.step;
+      that.simulateTil = data.simulateTil;
+      that.simulatePerRealSec = data.simulatePerRealSec;
+      that.precision = data.precision;
+
+      for (var key in data.particles) {
+        var p = new Particle();
+        p.deserialize(data.particles[key]);
+        console.log(p);
+      }
+
+    };
 
     this.simulate = async function() {
       var prevLogTime = new Date();
@@ -176,8 +207,9 @@ define(['core/geometry', 'core/entities/field'], function(Geometry, Fields) {
             await (function() { return new Promise(resolve => setTimeout(resolve, this.step * this.simulatePerRealSec - 0.001*(endTime - startTime)))})();;
           }
         }
-        $('#clock').text('Current time: ' + this.time);
+        $('#clock').text('Current time: ' + this.time.toFixed(4));
       }
+      $('#clock').text('Current time: ' + this.time.toFixed(4));
     }
 
   }

@@ -1,5 +1,9 @@
-define(['three', 'loaders/MTLLoader', 'loaders/OBJLoader', 'core/utils'], function(THREE, MTLLoader, OBJLoader, Utils) {
+define(['three', 'core/utils', 'loaders/MTLLoader', 'loaders/OBJLoader', 'loaders/AssimpJSONLoader', 'core/entities/modelLoader'], 
+  function(THREE, Utils, MTLLoader, OBJLoader, AssimpJSONLoader, ModelLoader) {
+  
   function Representation3D() {
+    var that = this;
+
     this.renderGroup = new THREE.Group();
 
     this.dump = [];
@@ -21,6 +25,16 @@ define(['three', 'loaders/MTLLoader', 'loaders/OBJLoader', 'core/utils'], functi
 
       this.renderGroup.add(sphere);
     };
+
+    this.addModel = function(name, radius) {
+      this.dump.push({addModel: {name: name, radius: radius}});
+      ModelLoader.getObject(name, function(object) {
+        object.scale.multiplyScalar(radius);
+        object.rotation.set(0.9 * Math.PI, 0, 0);
+        object.matrixAutoUpdate = true;
+        that.renderGroup.add(object);
+      })
+    }
 
     this.addLabel = function(text, offset, options) {
       this.dump.push({addLabel: {text: text, offset: offset, options: options}});
@@ -63,7 +77,7 @@ define(['three', 'loaders/MTLLoader', 'loaders/OBJLoader', 'core/utils'], functi
     */
 
 
-    this.unserialize = function(dump) {
+    this.deserialize = function(dump) {
       this.dump = [];
       this.renderGroup = new THREE.Group();
 
@@ -76,7 +90,13 @@ define(['three', 'loaders/MTLLoader', 'loaders/OBJLoader', 'core/utils'], functi
         }
         if ('addLabel' in prop) {
           opts = prop['addLabel'];
-          this.addLabel(opts.text, opts.offset, opt.options);
+          var text = opts['text'], offset = opts['offset'], options = opts['options'];
+          this.addLabel(text, offset, options);
+        }
+        if ('addModel' in prop) {
+          opts = prop['addModel'];
+          var name = opts['name'], radius = opts['radius'];
+          this.addModel(name, radius);
         }
       }
     };

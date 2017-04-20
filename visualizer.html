@@ -11,7 +11,7 @@
         height: 100%;
       }
       body {
-        background-color: #ffffff;
+        background-color: #000000;
         margin: 0;
         overflow: hidden;
         font-family: arial;
@@ -46,12 +46,12 @@
       animate();
 
       function init() {
-        camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
+        camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1e30 );
         camera.position.z = 500;
         //camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 1, 1000 )
 
         renderer = new THREE.WebGLRenderer();
-        renderer.setClearColor( 0xffffff );
+        renderer.setClearColor( 0x000000 );
         renderer.setPixelRatio( window.devicePixelRatio );
         renderer.setSize( window.innerWidth, window.innerHeight );
         document.body.appendChild( renderer.domElement );

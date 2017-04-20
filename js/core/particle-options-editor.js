@@ -6,7 +6,7 @@ define(
       var that = this;
  
       this.makeTextProperty = function(key) {
-        var field = $('<input type="text">'), fieldSetter = $('<input type="button" value="Set">');
+        var field = $('<input type="text">'), fieldSetter = $('<input type="button" class="btn btn-default" value="Set">');
         field.val(that.particle[key]);
         fieldSetter.click(function(event) {
           that.particle[key] = field.val();
@@ -27,7 +27,7 @@ define(
       };
 
       this.makeFloatProperty = function(key) {
-        var field = $('<input type="text">'), fieldSetter = $('<input type="button" value="Set">');
+        var field = $('<input type="text">'), fieldSetter = $('<input class="btn btn-default" type="button" value="Set">');
         field.val(that.particle[key]);
         fieldSetter.click(function(event) {
           if (!Utils.isFloat(field.val())) {
@@ -41,7 +41,7 @@ define(
       };
 
       this.makeVector3ComponentProperty = function(key, comp) {
-        var field = $('<input type="text">'), fieldSetter = $('<input type="button" value="Set">');
+        var field = $('<input type="text">'), fieldSetter = $('<input class="btn btn-default" type="button" value="Set">');
         field.val(that.particle[key][comp]);
         fieldSetter.click(function(event) {
           if (!Utils.isFloat(field.val())) {

@@ -14,7 +14,7 @@ define(['core/entities/particle', 'core/geometry'], function(Particle, Geometry)
   GravityField.prototype.impactOn = function(particle) {
     if (this.source.id == particle.id) return new Geometry.Vector3(0, 0, 0);
     var v = this.source.position.sub(particle.position);
-    return v.mul(this.G * this.source.mass * particle.mass / Math.pow(v.len() + 6400000, 3) );
+    return v.mul(this.G * this.source.mass * particle.mass / Math.pow(v.len(), 3) );
   };
   GravityField.prototype.__id = 'GravityField';
 
@@ -26,9 +26,9 @@ define(['core/entities/particle', 'core/geometry'], function(Particle, Geometry)
   RepulsionField.prototype.impactOn = function(particle) {
     if (this.source.id == particle.id) return new Geometry.Vector3(0, 0, 0);
     var v = particle.position.sub(this.source.position); // TODO 
-    return v.mul(this.alpha / Math.pow(v.len(), 6)); // v * (1 / v^6) => v^-5 // TODO: подгон (?)
+    return v.mul(this.alpha / Math.pow(Math.max(1e-12, v.len() - this.source.radius - particle.radius), 6)); // v * (1 / v^6) => v^-5 // TODO: подгон (?)
   };
-  RepulsionField.prototype.alpha = 1e9;
+  RepulsionField.prototype.alpha = 1e5;
   RepulsionField.prototype.__id = 'RepulsionField';
 
   // электромагнитное притяжение / отталкивание

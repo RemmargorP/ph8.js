@@ -7,7 +7,10 @@
     
     <script src="js/libs/jquery.js"></script>
     <script data-main="js/core/core-loader.js" src="js/libs/require.js"></script>
+
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet"/> -->
+    <link rel="stylesheet" type="text/css" href="css/style.css">
 
     <title>Control Panel</title>
   </head>
@@ -15,13 +18,32 @@
 
     <div class="container">
       <p class="h2">Dashboard</p>
+      
       <button class="btn btn-default" onclick="cpanel.addEntity();">Add Particle</button>
       <button class="btn btn-default" onclick="cpanel.addPlot2D();">Add Plot 2D</button>
       <button class="btn btn-default" onclick="cpanel.addPlot3D();">Add Plot 3D</button>
       <button class="btn btn-default" onclick="cpanel.openVisualizer();">Open Visualizer</button>
+      <span>Simulate til: <input id="timer" type="text"><button class="btn btn-default" onclick="cpanel.setSimulationEndingTime();">Set</button></span>
       <button id="core_state" class="glyphicon glyphicon-play" onclick="cpanel.toggleSimulation();"></button>
-      <span id="clock">Current time:</span>
-      <span>Simulate til: <input id="timer" type="text"><button onclick="cpanel.setSimulationEndingTime();">Set</button></span>
+      <span id="clock">Current time: <font color="red">CORE IS LOADING</font></span>
+      
+      <br>  
+      <br>  
+
+      <span class="form-inline">
+        <label for="loadfromconfigfile" class="btn btn-default">
+          Load Config
+        </label>
+         <input id="loadfromconfigfile" type="file"/> 
+      </span>
+
+     <span class="form-inline">
+        <label id="savetoconfigfile" class="btn btn-default">
+          Save Config
+        </label>
+      </span>
+      
+      
     </div>
 
     <div class="container" style="margin-top:60px;">
