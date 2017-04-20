@@ -1,0 +1,232 @@
+{
+  "time": 0,
+  "maxStep": 5000,
+  "step": 1,
+  "simulateTil": 123123123123123,
+  "simulatePerRealSec": 1,
+  "precision": 0.00001,
+  "fields": [
+    [
+      "GravityField",
+      "P_Sun"
+    ],
+    [
+      "GravityField",
+      "P_Earth"
+    ],
+		[
+			"GravityField",
+			"P_Mercury"
+		],
+		[
+			"GravityField",
+			"P_Venus"
+		],
+		[
+			"GravityField",
+			"P_Mars"
+		],
+		[
+			"GravityField",
+			"P_Jupiter"
+		],
+		[
+			"GravityField",
+			"P_Saturn"
+		]
+  ],
+  "particles": {
+    "P_Sun": {
+      "id": "P_Sun",
+      "name": "Sun",
+      "mass": 1.9885e+30,
+      "charge": 0,
+      "radius": 700000000,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "velocity": [
+        0,
+        0,
+        0
+      ],
+      "history": [],
+      "representation": [
+        {
+          "addBasicMesh": {
+            "radius": 7000000000,
+            "color": "#F9B900"
+          }
+        },
+        {
+          "addPointLight": {
+            "color": "#F9B900",
+            "intensity": 1,
+            "distance": 0,
+            "decay": 2
+          }
+        }
+      ]
+    },
+    "P_Earth": {
+      "id": "P_Earth",
+      "name": "Earth",
+      "mass": 6e+24,
+      "charge": 0,
+      "radius": 6400000,
+      "position": [
+        149000000000,
+        0,
+        0
+      ],
+      "velocity": [
+        0,
+        29800,
+        0
+      ],
+      "history": [],
+      "representation": [
+        {
+          "addModel": {
+            "name": "earth",
+            "radius": 5900000000
+          }
+        }
+      ]
+    },
+		"P_Mercury": {
+      "id": "P_Mercury",
+      "name": "Mercury",
+      "mass": 3.33e23,
+      "charge": 0,
+      "radius": 2439.7e3,
+      "position": [
+        57e9,
+        0,
+        0
+      ],
+      "velocity": [
+        0,
+        47360,
+        0
+      ],
+      "history": [],
+      "representation": [
+        {
+          "addBasicMesh": {
+            "radius": 2439.7e6,
+            "color": "#654B2A"
+          }
+        }
+      ]
+    },
+		"P_Venus": {
+      "id": "P_Venus",
+      "name": "Venus",
+      "mass": 4.86e24,
+      "charge": 0,
+      "radius": 6051.8e3,
+      "position": [
+        108e9,
+        0,
+        0
+      ],
+      "velocity": [
+        0,
+        35020,
+        0
+      ],
+      "history": [],
+      "representation": [
+        {
+          "addBasicMesh": {
+            "radius": 6051.8e6,
+            "color": "#FEF3B0"
+          }
+        }
+      ]
+    },
+		"P_Mars": {
+      "id": "P_Mars",
+      "name": "Mars",
+      "mass": 6.4e23,
+      "charge": 0,
+      "radius": 3389.5e3,
+      "position": [
+        228e9,
+        0,
+        0
+      ],
+      "velocity": [
+        0,
+        24130,
+        0
+      ],
+      "history": [],
+      "representation": [
+        {
+          "addBasicMesh": {
+            "radius": 3389.5e6,
+            "color": "#FA8849"
+          }
+        }
+      ]
+    },
+		"P_Jupiter": {
+      "id": "P_Jupiter",
+      "name": "Jupiter",
+      "mass": 1.8986e27,
+      "charge": 0,
+      "radius": 69911e3,
+      "position": [
+        778.6e9,
+        0,
+        0
+      ],
+      "velocity": [
+        0,
+        13070,
+        0
+      ],
+      "history": [],
+      "representation": [
+        {
+          "addBasicMesh": {
+            "radius": 69911e5,
+            "color": "#B07C2F"
+          }
+        }
+      ]
+    },
+		"P_Saturn": {
+      "id": "P_Saturn",
+      "name": "Saturn",
+      "mass": 5.6846e26,
+      "charge": 0,
+      "radius": 58232e3,
+      "position": [
+        1443.7e9,
+        0,
+        0
+      ],
+      "velocity": [
+        0,
+        9690,
+        0
+      ],
+      "history": [],
+      "representation": [
+        {
+          "addBasicMesh": {
+            "radius": 58232e5,
+            "color": "#D4A161"
+          }
+        }
+      ]
+    }
+  },
+	"reprSizeIncreasedManually": 1e3,
+	"reprSizeIncreasedManuallyJupiter_Saturn": 1e2
+}

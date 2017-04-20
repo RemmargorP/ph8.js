@@ -47,7 +47,8 @@
 
       function init() {
         camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1e30 );
-        camera.position.z = 500;
+        //camera.position.z = 500;
+        camera.position.z = 7000000000;
         //camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 1, 1000 )
 
         renderer = new THREE.WebGLRenderer({antialias: true, logarithmicDepthBuffer: true});
