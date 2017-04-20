@@ -30,10 +30,20 @@ define(['three', 'core/utils', 'loaders/MTLLoader', 'loaders/OBJLoader', 'loader
       this.dump.push({addModel: {name: name, radius: radius}});
       ModelLoader.getObject(name, function(object) {
         object.scale.multiplyScalar(radius);
-        object.rotation.set(0.9 * Math.PI, 0, 0);
-        object.matrixAutoUpdate = true;
         that.renderGroup.add(object);
       })
+    };
+
+    this.addPointLight = function(color, intensity, distance, decay) {
+      color = color || '#ffffff';
+      intensity = intensity || 1;
+      distance = distance || 0;
+      decay = decay || 1;
+
+      this.dump.push({addPointLight: {color: color, intensity: intensity, distance: distance, decay: decay}});
+
+      var light = new THREE.PointLight( color, intensity, distance, decay );
+      this.renderGroup.add(light);
     }
 
     this.addLabel = function(text, offset, options) {
@@ -49,33 +59,6 @@ define(['three', 'core/utils', 'loaders/MTLLoader', 'loaders/OBJLoader', 'loader
 
       this.renderGroup.add(label);
     };
-
-    /*/////////////////////
-    var mtlLoader = new THREE.MTLLoader();
-    mtlLoader.setPath( 'scenes/models/cat/' );
-    mtlLoader.load( 'cat.mtl', function( materials ) {
-      materials.preload();
-      var objLoader = new THREE.OBJLoader();
-      objLoader.setMaterials( materials );
-      objLoader.setPath( 'scenes/models/cat/' );
-      objLoader.load( 'cat.obj', function ( renderGroup ) {
-        renderGroup.__dirtyPosition = true;
-        renderGroup.__dirtyRotation = true;
-        renderGroup.matrixAutoUpdate = false;
-        renderGroup.position.set(that.position.x, that.position.y, that.position.z);
-        renderGroup.updateMatrix();
-        that.renderrenderGroup = renderGroup;
-      });
-    });
-
-    (async function() {
-      while (!that.renderrenderGroup) {
-        await (new Promise(resolve => setTimeout(resolve, 30)));
-      };
-    })();
-    /////////////////////
-    */
-
 
     this.deserialize = function(dump) {
       this.dump = [];
@@ -97,6 +80,10 @@ define(['three', 'core/utils', 'loaders/MTLLoader', 'loaders/OBJLoader', 'loader
           opts = prop['addModel'];
           var name = opts['name'], radius = opts['radius'];
           this.addModel(name, radius);
+        }
+        if ('addPointLight' in prop) {
+          opts = prop['addPointLight'];
+          this.addPointLight(opts.color, opts.intensity, opts.distance, opts.decay);
         }
       }
     };

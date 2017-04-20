@@ -9,17 +9,10 @@ define(
       this.generateId = Utils.generateId;
       this.scene = new THREE.Scene();
 
-      this.scene.add(new THREE.AxisHelper(50000000));
-      this.scene.add( new THREE.AmbientLight( 0x404040 ) );
+      this.scene.add(new THREE.AxisHelper(1e9));
+      this.scene.add( new THREE.AmbientLight( 0x292929 ) );
+      //this.scene.add( new THREE.AmbientLight( 0xeeeeee ) );
 
-{
-              var directionalLight = new THREE.DirectionalLight( 0xeeeeee );
-        directionalLight.position.x = 1;
-        directionalLight.position.y = 0;
-        directionalLight.position.z = 0;
-        directionalLight.position.normalize();
-        this.scene.add( directionalLight );
-}
       this.core = new Core.Core();
 
       this.runSimulation = async function() {
@@ -74,17 +67,39 @@ define(
         that.scene.add(p.representation.renderGroup);
         */
         {
+          var Sun = new Particle({
+            name: 'Sun',
+            mass: 1.9885e30,
+            charge: 0,
+            radius: 7e8,
+            position: new Geometry.Vector3(0, 0, 0),
+            velocity: new Geometry.Vector3(0, 0, 0),
+          });
+
+          Sun.representation.addBasicMesh(700e8, '#F9B900');
+          Sun.representation.addPointLight('#F9B900', 1, 0, 2);
+
+          Sun.generateDOMs();
+
+          this.core.addParticle(Sun);
+          this.core.addField('GravityField', Sun.id);
+          this.core.addField('RepulsionField', Sun.id);
+
+          $('#particles').append(Sun.DOMs.listRow);
+          that.scene.add(Sun.representation.renderGroup);
+        }
+
+        {
           var Earth = new Particle({
             name: 'Earth',
             mass: 6e24,
             charge: 0,
             radius: 6400000,
-            position: new Geometry.Vector3(-6400100, 0, 0),
-            velocity: new Geometry.Vector3(0, 0, 0),
+            position: new Geometry.Vector3(149e9, 0, 0),
+            velocity: new Geometry.Vector3(0, 29.8e3, 0),
           });
 
-          Earth.representation.addModel('earth', 5900000);
-          Earth.representation.addLabel('Earth', {x:10, y:10, z:10});
+          Earth.representation.addModel('earth', 5.9e8);
 
           Earth.generateDOMs();
 
@@ -102,11 +117,11 @@ define(
             mass: 7.3e22,
             charge: 0,
             radius: 1738e3,
-            position: new Geometry.Vector3(385e6, 0, 0),
-            velocity: new Geometry.Vector3(0, 1.02e3, 0),
+            position: new Geometry.Vector3(149e9 + 385e6, 0, 0),
+            velocity: new Geometry.Vector3(0, 29.8e3 + 1.02e3, 0),
           });
 
-          Moon.representation.addModel('moon', 1738e3);
+          Moon.representation.addBasicMesh(1.738e8, '#4D5552');
 
           Moon.generateDOMs();
 

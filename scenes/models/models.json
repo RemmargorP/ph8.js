@@ -3,10 +3,5 @@
     "type": "obj_mtl",
     "path": "scenes/models/low_poly_earth/earth",
     "cast_radius": 0.01
-  },
-  "moon": {
-    "type": "obj",
-    "path": "scenes/models/low_poly_moon/moon",
-    "cast_radius": 0.01
   }
 }

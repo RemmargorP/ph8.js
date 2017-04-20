@@ -21,7 +21,7 @@ define(['jquery', 'three', 'loaders/MTLLoader', 'loaders/OBJLoader', 'loaders/As
         objLoader.load( config.path + '.obj', function(object) {
           object.scale.multiplyScalar(config.cast_radius);
           next(object);
-        } );
+        }, function(p) { console.log("PROG", p); }, function(e) { console.log("ERROR", e); } );
       });
     };
 
