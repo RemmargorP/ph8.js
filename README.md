@@ -2,6 +2,7 @@
 
 To see some working stuff use prepared json config from scenes folder. Load it with "Load config" button and then run visualizer and start simulation. Zoom out a little bit and move camera with mouse.
 
+https://remmargorp.github.io/ph8.js/
 
 
 
