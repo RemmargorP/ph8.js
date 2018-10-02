@@ -1,5 +1,10 @@
 # Ph8.js
 
+To see some working stuff use prepared json config from scenes folder. Load it with "Load config" button and then run visualizer and start simulation. Zoom out a little bit and move camera with mouse.
+
+
+
+
 ### Возможности
 - [x] **Код на JavaScript -- позволяет выполнять симуляцию в браузере, а значит будет доступно на большинстве платформ и устройств**
 - [ ] **_Поддержка классических физических законов для материальных точек:_**
